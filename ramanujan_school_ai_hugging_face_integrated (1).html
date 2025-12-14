@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ramanujan School AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#0f1220;
+      --card:#161a35;
+      --accent:#6cf2c2;
+      --accent2:#7aa2ff;
+      --text:#e7e9ff;
+      --muted:#aab0ff;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; font-family:Inter,system-ui,Segoe UI,Roboto,Arial;
+      background:
+        linear-gradient(rgba(15,18,32,.75), rgba(15,18,32,.75)),
+        url('assets/images/bg.png') center/cover no-repeat;
+      color:var(--text);
+      min-height:100vh; display:flex; align-items:center; justify-content:center;
+    }
+    .app{
+      width:min(980px, 94vw); height:min(620px, 90vh);
+      background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,0)),
+                 var(--card);
+      border-radius:22px; box-shadow:0 30px 80px rgba(0,0,0,.45);
+      display:grid; grid-template-rows:auto 1fr auto; overflow:hidden;
+    }
+    header{
+      padding:18px 22px; display:flex; align-items:center; gap:12px;
+      border-bottom:1px solid rgba(255,255,255,.08);
+    }
+    .logo{
+      width:38px; height:38px; border-radius:10px;
+      background:rgba(255,255,255,.9);
+      display:grid; place-items:center;
+      overflow:hidden;
+    }
+    .logo img{width:100%; height:100%; object-fit:contain}
+    header h1{font-size:18px; margin:0}
+    header span{color:var(--muted); font-size:13px}
+
+    .chat{padding:18px; overflow:auto}
+    .msg{max-width:78%; margin-bottom:14px; padding:12px 14px; border-radius:14px; line-height:1.45}
+    .user{margin-left:auto; background:linear-gradient(135deg, #2a3170, #2d3aa6)}
+    .ai{background:#202661}
+
+    footer{padding:14px; border-top:1px solid rgba(255,255,255,.08)}
+    .input{
+      display:flex; gap:10px; align-items:center;
+      background:#0e1230; padding:10px; border-radius:14px;
+    }
+    input{
+      flex:1; background:transparent; border:none; outline:none; color:var(--text);
+      font-size:14px;
+    }
+    button{
+      border:none; cursor:pointer; padding:10px 14px; border-radius:12px;
+      background:linear-gradient(135deg, var(--accent), var(--accent2));
+      color:#071515; font-weight:700;
+    }
+    button:disabled{opacity:.6; cursor:not-allowed}
+    .hint{font-size:12px; color:var(--muted); margin-top:6px}
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div class="logo"><img src="assets/images/logo.png" alt="School Logo"></div>
+      <div>
+        <h1>Ramanujan School AI</h1>
+        <span>Homework help • Concepts • Practice</span>
+      </div>
+    </header>
+
+    <div id="chat" class="chat">
+      <div class="msg ai">Hello! I’m Ramanujan School AI. Ask me any school question 🙂</div>
+    </div>
+
+    <footer>
+      <div class="input">
+        <input id="q" placeholder="Type your question…" />
+        <button id="send">Send</button>
+      </div>
+      <div class="hint">Demo project UI. Hugging Face Gemma-2B-IT integrated.</div>
+    </footer>
+  </div>
+
+<script>
+  /* ======================================================
+     ADD YOUR HUGGING FACE API KEY HERE (DEV ONLY)
+     NEVER expose this on a public website
+  ====================================================== */
+  window.HF_API_KEY = "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";
+
+  const chat = document.getElementById('chat');
+  const q = document.getElementById('q');
+  const send = document.getElementById('send');
+
+  // ===== OFFLINE KNOWLEDGE BASE =====
+  const JAGANNATH_KB = `
+Lord Jagannath is a revered form of Lord Vishnu/Krishna, worshipped primarily in Odisha, India.
+He is traditionally worshipped along with his siblings: Lord Balabhadra and Devi Subhadra.
+
+Jagannath Puri Temple is one of the Char Dham pilgrimage sites of Hinduism.
+The temple is located in Puri, Odisha, near the Bay of Bengal.
+
+A unique feature of Jagannath worship is the wooden idols (daru brahma), which are ritually renewed in a sacred ceremony known as Nabakalebara.
+
+The annual Rath Yatra (Chariot Festival) is a major event where the deities are taken out of the temple on massive chariots so that everyone can have darshan.
+
+The temple kitchen is among the largest in the world, and food (Mahaprasad) is cooked using traditional methods and shared equally among devotees.
+
+Jagannath symbolizes universality, compassion, and inclusiveness, welcoming people from all backgrounds.
+`;
+
+  // ===== SIMPLE INTENT HANDLERS =====
+  function isGreeting(t){return /^(hi|hello|hey|namaste)/i.test(t)}
+  function isHowAreYou(t){return /(how are you|how r u)/i.test(t)}
+  function isJagannathQuery(t){return /(jagannath|jagannatha|puri|rath yatra|nabakalebara|mahaprasad)/i.test(t)}
+
+  function offlineReply(text){
+    if(isGreeting(text)) return "Hello. How may I assist you today?";
+    if(isHowAreYou(text)) return "I am functioning well. Thank you for asking.";
+    if(isJagannathQuery(text)) return JAGANNATH_KB;
+    return null;
+  }
+
+  function add(text, cls){
+    const d = document.createElement('div');
+    d.className = `msg ${cls}`;
+    d.textContent = text;
+    chat.appendChild(d);
+    chat.scrollTop = chat.scrollHeight;
+  }
+
+  async function ask(){
+    const text = q.value.trim();
+    if(!text) return;
+    q.value = '';
+    add(text, 'user');
+    send.disabled = true;
+
+    // ===== OFFLINE FIRST =====
+    const local = offlineReply(text);
+    if(local){
+      add(local, 'ai');
+      send.disabled = false;
+      return;
+    }
+
+    // ===== HUGGING FACE FALLBACK (ROBUST) =====
+    try {
+      const res = await fetch(
+        'https://api-inference.huggingface.co/models/google/gemma-2b-it',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + window.HF_API_KEY
+          },
+          body: JSON.stringify({
+            inputs: text,
+            options: { wait_for_model: true }
+          })
+        }
+      );
+
+      const data = await res.json();
+      console.log('HF RESPONSE:', data);
+
+      if (data?.error) {
+        add('AI is waking up… please retry in 10–20 seconds.', 'ai');
+      }
+      else if (Array.isArray(data) && data[0]?.generated_text) {
+        add(data[0].generated_text, 'ai');
+      }
+      else if (data?.generated_text) {
+        add(data.generated_text, 'ai');
+      }
+      else {
+        add('AI did not return a valid response. Please try again.', 'ai');
+      }
+
+    } catch (e) {
+      console.error(e);
+      add('Network error. Please check your internet connection.', 'ai');
+    }
+    send.disabled = false;
+  }
+
+  send.onclick = ask;
+  q.addEventListener('keydown', e => { if(e.key === 'Enter') ask(); });
+</script>
+</body>
+</html>
