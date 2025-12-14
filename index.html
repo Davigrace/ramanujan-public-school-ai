@@ -2,16 +2,15 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Ramanujan School AI</title>
+  <title>Ramanujan Public School AI</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <style>
     body {
+      margin: 0;
       font-family: Arial, sans-serif;
       background: #0f172a;
       color: #e5e7eb;
-      margin: 0;
-      padding: 0;
     }
 
     header {
@@ -24,7 +23,7 @@
 
     main {
       max-width: 800px;
-      margin: 30px auto;
+      margin: 40px auto;
       padding: 20px;
     }
 
@@ -35,8 +34,8 @@
       font-size: 16px;
       border-radius: 8px;
       border: none;
-      resize: none;
       outline: none;
+      resize: none;
     }
 
     button {
@@ -57,16 +56,16 @@
 
     .output {
       margin-top: 20px;
-      padding: 15px;
+      padding: 16px;
       background: #020617;
       border-radius: 8px;
+      min-height: 80px;
       white-space: pre-wrap;
-      min-height: 60px;
     }
 
     footer {
-      text-align: center;
       margin-top: 40px;
+      text-align: center;
       font-size: 14px;
       color: #94a3b8;
     }
@@ -77,7 +76,7 @@
   <header>Ramanujan Public School AI</header>
 
   <main>
-    <p>Ask any academic question:</p>
+    <p>Ask an academic question:</p>
 
     <textarea id="question" placeholder="Example: Explain Newton's first law in simple words"></textarea>
 
@@ -87,11 +86,13 @@
   </main>
 
   <footer>
-    Powered by Hugging Face (Gemma 2B)
+    Powered by Hugging Face (Mistral 7B)
   </footer>
 
   <script>
-    const API_URL = "https://api-inference.huggingface.co/models/google/gemma-2b-it";
+    // ✅ BROWSER-SAFE MODEL
+    const API_URL =
+      "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2";
 
     let HF_API_KEY = "";
 
@@ -108,13 +109,14 @@
       if (!HF_API_KEY) {
         HF_API_KEY = prompt("Enter your Hugging Face API key:");
         if (!HF_API_KEY) {
-          answerBox.textContent = "API key is required.";
+          answerBox.textContent = "API key is required to continue.";
           return;
         }
       }
 
       button.disabled = true;
-      answerBox.textContent = "AI is thinking... (first response may take ~10 seconds)";
+      answerBox.textContent =
+        "AI is thinking...\n(First response may take 10–15 seconds)";
 
       try {
         const response = await fetch(API_URL, {
@@ -125,6 +127,10 @@
           },
           body: JSON.stringify({
             inputs: question,
+            parameters: {
+              max_new_tokens: 300,
+              temperature: 0.7
+            },
             options: {
               wait_for_model: true
             }
@@ -132,8 +138,8 @@
         });
 
         if (!response.ok) {
-          const text = await response.text();
-          throw new Error(text);
+          const errorText = await response.text();
+          throw new Error(errorText);
         }
 
         const data = await response.json();
@@ -141,18 +147,19 @@
         if (Array.isArray(data) && data[0]?.generated_text) {
           answerBox.textContent = data[0].generated_text;
         } else {
-          answerBox.textContent = "No response from model. Try again.";
+          answerBox.textContent =
+            "No response received. Please try again.";
         }
 
-      } catch (error) {
-        console.error(error);
+      } catch (err) {
+        console.error(err);
         answerBox.textContent =
-          "⚠️ Error contacting AI.\n" +
+          "⚠️ Error contacting AI.\n\n" +
           "Possible reasons:\n" +
+          "- Invalid or revoked API key\n" +
           "- Model is waking up\n" +
-          "- Invalid API key\n" +
-          "- Temporary Hugging Face issue\n\n" +
-          "Try again after 10 seconds.";
+          "- Hugging Face temporary issue\n\n" +
+          "Wait 10 seconds and try again.";
       }
 
       button.disabled = false;
