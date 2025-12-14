@@ -2,201 +2,163 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Ramanujan School AI</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <style>
-    :root{
-      --bg:#0f1220;
-      --card:#161a35;
-      --accent:#6cf2c2;
-      --accent2:#7aa2ff;
-      --text:#e7e9ff;
-      --muted:#aab0ff;
+    body {
+      font-family: Arial, sans-serif;
+      background: #0f172a;
+      color: #e5e7eb;
+      margin: 0;
+      padding: 0;
     }
-    *{box-sizing:border-box}
-    body{
-      margin:0; font-family:Inter,system-ui,Segoe UI,Roboto,Arial;
-      background:
-        linear-gradient(rgba(15,18,32,.75), rgba(15,18,32,.75)),
-        url('assets/images/bg.png') center/cover no-repeat;
-      color:var(--text);
-      min-height:100vh; display:flex; align-items:center; justify-content:center;
-    }
-    .app{
-      width:min(980px, 94vw); height:min(620px, 90vh);
-      background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,0)),
-                 var(--card);
-      border-radius:22px; box-shadow:0 30px 80px rgba(0,0,0,.45);
-      display:grid; grid-template-rows:auto 1fr auto; overflow:hidden;
-    }
-    header{
-      padding:18px 22px; display:flex; align-items:center; gap:12px;
-      border-bottom:1px solid rgba(255,255,255,.08);
-    }
-    .logo{
-      width:38px; height:38px; border-radius:10px;
-      background:rgba(255,255,255,.9);
-      display:grid; place-items:center;
-      overflow:hidden;
-    }
-    .logo img{width:100%; height:100%; object-fit:contain}
-    header h1{font-size:18px; margin:0}
-    header span{color:var(--muted); font-size:13px}
 
-    .chat{padding:18px; overflow:auto}
-    .msg{max-width:78%; margin-bottom:14px; padding:12px 14px; border-radius:14px; line-height:1.45}
-    .user{margin-left:auto; background:linear-gradient(135deg, #2a3170, #2d3aa6)}
-    .ai{background:#202661}
+    header {
+      background: #020617;
+      padding: 16px;
+      text-align: center;
+      font-size: 22px;
+      font-weight: bold;
+    }
 
-    footer{padding:14px; border-top:1px solid rgba(255,255,255,.08)}
-    .input{
-      display:flex; gap:10px; align-items:center;
-      background:#0e1230; padding:10px; border-radius:14px;
+    main {
+      max-width: 800px;
+      margin: 30px auto;
+      padding: 20px;
     }
-    input{
-      flex:1; background:transparent; border:none; outline:none; color:var(--text);
-      font-size:14px;
+
+    textarea {
+      width: 100%;
+      height: 120px;
+      padding: 12px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: none;
+      resize: none;
+      outline: none;
     }
-    button{
-      border:none; cursor:pointer; padding:10px 14px; border-radius:12px;
-      background:linear-gradient(135deg, var(--accent), var(--accent2));
-      color:#071515; font-weight:700;
+
+    button {
+      margin-top: 12px;
+      padding: 12px 20px;
+      font-size: 16px;
+      background: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
     }
-    button:disabled{opacity:.6; cursor:not-allowed}
-    .hint{font-size:12px; color:var(--muted); margin-top:6px}
+
+    button:disabled {
+      background: #475569;
+      cursor: not-allowed;
+    }
+
+    .output {
+      margin-top: 20px;
+      padding: 15px;
+      background: #020617;
+      border-radius: 8px;
+      white-space: pre-wrap;
+      min-height: 60px;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 40px;
+      font-size: 14px;
+      color: #94a3b8;
+    }
   </style>
 </head>
+
 <body>
-  <div class="app">
-    <header>
-      <div class="logo"><img src="assets/images/logo.png" alt="School Logo"></div>
-      <div>
-        <h1>Ramanujan School AI</h1>
-        <span>Homework help • Concepts • Practice</span>
-      </div>
-    </header>
+  <header>Ramanujan Public School AI</header>
 
-    <div id="chat" class="chat">
-      <div class="msg ai">Hello! I’m Ramanujan School AI. Ask me any school question 🙂</div>
-    </div>
+  <main>
+    <p>Ask any academic question:</p>
 
-    <footer>
-      <div class="input">
-        <input id="q" placeholder="Type your question…" />
-        <button id="send">Send</button>
-      </div>
-      <div class="hint">Demo project UI. Hugging Face Gemma-2B-IT integrated.</div>
-    </footer>
-  </div>
+    <textarea id="question" placeholder="Example: Explain Newton's first law in simple words"></textarea>
 
-<script>
-  /* ======================================================
-     ADD YOUR HUGGING FACE API KEY HERE (DEV ONLY)
-     NEVER expose this on a public website
-  ====================================================== */
-  window.HF_API_KEY = "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";
+    <button id="askBtn">Ask AI</button>
 
-  const chat = document.getElementById('chat');
-  const q = document.getElementById('q');
-  const send = document.getElementById('send');
+    <div class="output" id="answer">Waiting for input...</div>
+  </main>
 
-  // ===== OFFLINE KNOWLEDGE BASE =====
-  const JAGANNATH_KB = `
-Lord Jagannath is a revered form of Lord Vishnu/Krishna, worshipped primarily in Odisha, India.
-He is traditionally worshipped along with his siblings: Lord Balabhadra and Devi Subhadra.
+  <footer>
+    Powered by Hugging Face (Gemma 2B)
+  </footer>
 
-Jagannath Puri Temple is one of the Char Dham pilgrimage sites of Hinduism.
-The temple is located in Puri, Odisha, near the Bay of Bengal.
+  <script>
+    const API_URL = "https://api-inference.huggingface.co/models/google/gemma-2b-it";
 
-A unique feature of Jagannath worship is the wooden idols (daru brahma), which are ritually renewed in a sacred ceremony known as Nabakalebara.
+    let HF_API_KEY = "";
 
-The annual Rath Yatra (Chariot Festival) is a major event where the deities are taken out of the temple on massive chariots so that everyone can have darshan.
+    async function askAI() {
+      const question = document.getElementById("question").value.trim();
+      const answerBox = document.getElementById("answer");
+      const button = document.getElementById("askBtn");
 
-The temple kitchen is among the largest in the world, and food (Mahaprasad) is cooked using traditional methods and shared equally among devotees.
+      if (!question) {
+        answerBox.textContent = "Please enter a question.";
+        return;
+      }
 
-Jagannath symbolizes universality, compassion, and inclusiveness, welcoming people from all backgrounds.
-`;
+      if (!HF_API_KEY) {
+        HF_API_KEY = prompt("Enter your Hugging Face API key:");
+        if (!HF_API_KEY) {
+          answerBox.textContent = "API key is required.";
+          return;
+        }
+      }
 
-  // ===== SIMPLE INTENT HANDLERS =====
-  function isGreeting(t){return /^(hi|hello|hey|namaste)/i.test(t)}
-  function isHowAreYou(t){return /(how are you|how r u)/i.test(t)}
-  function isJagannathQuery(t){return /(jagannath|jagannatha|puri|rath yatra|nabakalebara|mahaprasad)/i.test(t)}
+      button.disabled = true;
+      answerBox.textContent = "AI is thinking... (first response may take ~10 seconds)";
 
-  function offlineReply(text){
-    if(isGreeting(text)) return "Hello. How may I assist you today?";
-    if(isHowAreYou(text)) return "I am functioning well. Thank you for asking.";
-    if(isJagannathQuery(text)) return JAGANNATH_KB;
-    return null;
-  }
-
-  function add(text, cls){
-    const d = document.createElement('div');
-    d.className = `msg ${cls}`;
-    d.textContent = text;
-    chat.appendChild(d);
-    chat.scrollTop = chat.scrollHeight;
-  }
-
-  async function ask(){
-    const text = q.value.trim();
-    if(!text) return;
-    q.value = '';
-    add(text, 'user');
-    send.disabled = true;
-
-    // ===== OFFLINE FIRST =====
-    const local = offlineReply(text);
-    if(local){
-      add(local, 'ai');
-      send.disabled = false;
-      return;
-    }
-
-    // ===== HUGGING FACE FALLBACK (ROBUST) =====
-    try {
-      const res = await fetch(
-        'https://api-inference.huggingface.co/models/google/gemma-2b-it',
-        {
-          method: 'POST',
+      try {
+        const response = await fetch(API_URL, {
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + window.HF_API_KEY
+            "Authorization": "Bearer " + HF_API_KEY,
+            "Content-Type": "application/json"
           },
           body: JSON.stringify({
-            inputs: text,
-            options: { wait_for_model: true }
+            inputs: question,
+            options: {
+              wait_for_model: true
+            }
           })
+        });
+
+        if (!response.ok) {
+          const text = await response.text();
+          throw new Error(text);
         }
-      );
 
-      const data = await res.json();
-      console.log('HF RESPONSE:', data);
+        const data = await response.json();
 
-      if (data?.error) {
-        add('AI is waking up… please retry in 10–20 seconds.', 'ai');
-      }
-      else if (Array.isArray(data) && data[0]?.generated_text) {
-        add(data[0].generated_text, 'ai');
-      }
-      else if (data?.generated_text) {
-        add(data.generated_text, 'ai');
-      }
-      else {
-        add('AI did not return a valid response. Please try again.', 'ai');
+        if (Array.isArray(data) && data[0]?.generated_text) {
+          answerBox.textContent = data[0].generated_text;
+        } else {
+          answerBox.textContent = "No response from model. Try again.";
+        }
+
+      } catch (error) {
+        console.error(error);
+        answerBox.textContent =
+          "⚠️ Error contacting AI.\n" +
+          "Possible reasons:\n" +
+          "- Model is waking up\n" +
+          "- Invalid API key\n" +
+          "- Temporary Hugging Face issue\n\n" +
+          "Try again after 10 seconds.";
       }
 
-    } catch (e) {
-      console.error(e);
-      add('Network error. Please check your internet connection.', 'ai');
+      button.disabled = false;
     }
-    send.disabled = false;
-  }
 
-  send.onclick = ask;
-  q.addEventListener('keydown', e => { if(e.key === 'Enter') ask(); });
-</script>
+    document.getElementById("askBtn").addEventListener("click", askAI);
+  </script>
 </body>
 </html>
