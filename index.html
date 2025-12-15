@@ -5,7 +5,6 @@
   <title>Ramanujan Public School AI</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- ===== GLOBAL STYLES (same dark theme, background-first layout) ===== -->
   <style>
     body {
       margin: 0;
@@ -16,7 +15,7 @@
       display: flex;
     }
 
-    /* ===== SIDEBAR (API KEY BOX) ===== */
+    /* Sidebar */
     .sidebar {
       width: 260px;
       background: #020617;
@@ -25,39 +24,27 @@
       box-sizing: border-box;
     }
 
-    .sidebar h3 {
-      margin-top: 0;
-      font-size: 18px;
-    }
-
-    .sidebar p {
-      font-size: 13px;
-      color: #94a3b8;
-    }
-
+    .sidebar h3 { margin-top: 0; }
+    .sidebar p { font-size: 12px; color: #94a3b8; }
     .sidebar input {
       width: 100%;
       padding: 10px;
-      margin-top: 8px;
       border-radius: 6px;
       border: none;
-      outline: none;
-      font-size: 14px;
+      margin-top: 6px;
     }
-
     .sidebar button {
       width: 100%;
       margin-top: 10px;
       padding: 10px;
       border-radius: 6px;
       border: none;
-      cursor: pointer;
       background: #2563eb;
       color: #fff;
-      font-size: 14px;
+      cursor: pointer;
     }
 
-    /* ===== MAIN APP ===== */
+    /* Main App */
     .app {
       flex: 1;
       display: flex;
@@ -68,21 +55,14 @@
     }
 
     header {
-      background: rgba(2, 6, 23, 0.9);
+      background: rgba(2,6,23,0.9);
       padding: 12px 16px;
       display: flex;
       align-items: center;
       gap: 10px;
     }
-
-    header img {
-      height: 36px;
-    }
-
-    header span {
-      font-size: 20px;
-      font-weight: bold;
-    }
+    header img { height: 36px; }
+    header span { font-size: 20px; font-weight: bold; }
 
     #chat {
       flex: 1;
@@ -97,63 +77,46 @@
       border-radius: 10px;
       white-space: pre-wrap;
     }
-
-    .user {
-      background: #2563eb;
-      margin-left: auto;
-    }
-
-    .ai {
-      background: rgba(2, 6, 23, 0.85);
-      border: 1px solid #1e293b;
-    }
+    .user { background: #2563eb; margin-left: auto; }
+    .ai { background: rgba(2,6,23,0.85); border: 1px solid #1e293b; }
 
     footer {
       display: flex;
       padding: 10px;
       gap: 10px;
-      background: rgba(2, 6, 23, 0.9);
+      background: rgba(2,6,23,0.9);
     }
-
     footer input {
       flex: 1;
       padding: 10px;
       border-radius: 8px;
       border: none;
-      outline: none;
       font-size: 15px;
     }
-
     footer button {
       padding: 10px 18px;
       border-radius: 8px;
       border: none;
-      cursor: pointer;
       background: #2563eb;
       color: #fff;
-      font-size: 15px;
-    }
-
-    footer button:disabled {
-      background: #475569;
-      cursor: not-allowed;
+      cursor: pointer;
     }
   </style>
 </head>
 
 <body>
-  <!-- ===== API KEY SIDEBAR ===== -->
+  <!-- API Sidebar -->
   <div class="sidebar">
     <h3>API Settings</h3>
-    <p style="font-size:12px;line-height:1.4">Paste your <b>OpenRouter API key</b> below. If left empty, the assistant works in <i>offline mode</i>.</p>
+    <p>Enter your OpenRouter API key. Leave empty to use offline mode.</p>
     <input id="apiKeyInput" type="password" placeholder="sk-or-xxxxxxxx" />
     <button onclick="saveKey()">Save & Use</button>
   </div>
 
-  <!-- ===== MAIN APPLICATION ===== -->
+  <!-- Main App -->
   <div class="app">
     <header>
-      <img src="assets/logo.png" alt="School Logo" />
+      <img src="logo.png" alt="School Logo" />
       <span>Ramanujan Public School AI</span>
     </header>
 
@@ -166,27 +129,26 @@
   </div>
 
   <script>
-    /* ================== LIMITED OFFLINE DATA ================== */
+    /* Offline Data */
     const OFFLINE_DATA = {
-      "principal": "The principal of Ramanujan Public School oversees academic and administrative activities.",
-      "school": "Ramanujan Public School focuses on discipline, academics, and holistic student development.",
-      "address": "Ramanujan Public School is located in India.",
+      principal: "The principal manages academics and administration at Ramanujan Public School.",
+      school: "Ramanujan Public School focuses on discipline, academics, and holistic development.",
+      address: "Ramanujan Public School is located in India."
     };
 
-    /* ================== OPENROUTER CONFIG ================== */
-    const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
-    const MODEL = "mistralai/mistral-7b-instruct";
+    /* OpenRouter Config */
+    const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
+    const MODEL = 'mistralai/mistral-7b-instruct';
 
-    let API_KEY = localStorage.getItem("OPENROUTER_KEY") || "";
-    document.getElementById("apiKeyInput").value = API_KEY;
+    let API_KEY = localStorage.getItem('OPENROUTER_KEY') || '';
+    document.getElementById('apiKeyInput').value = API_KEY;
 
     function saveKey() {
-      API_KEY = document.getElementById("apiKeyInput").value.trim();
-      localStorage.setItem("OPENROUTER_KEY", API_KEY);
-      alert("API key saved.");
+      API_KEY = document.getElementById('apiKeyInput').value.trim();
+      localStorage.setItem('OPENROUTER_KEY', API_KEY);
+      alert('API key saved');
     }
 
-    /* ================== CHAT HELPERS ================== */
     const chat = document.getElementById('chat');
     const input = document.getElementById('input');
     const send = document.getElementById('send');
@@ -199,22 +161,19 @@
       chat.scrollTop = chat.scrollHeight;
     }
 
-    /* ================== MAIN ASK FUNCTION ================== */
     async function ask(text) {
       send.disabled = true;
 
-      // ---- OFFLINE CHECK ----
-      for (const key in OFFLINE_DATA) {
-        if (text.toLowerCase().includes(key)) {
-          add(OFFLINE_DATA[key], 'ai');
+      for (const k in OFFLINE_DATA) {
+        if (text.toLowerCase().includes(k)) {
+          add(OFFLINE_DATA[k], 'ai');
           send.disabled = false;
           return;
         }
       }
 
-      // ---- NO API KEY: OFFLINE-ONLY MODE ----
       if (!API_KEY) {
-        add("Offline mode: no API key provided.", 'ai');
+        add('Offline mode: no API key provided.', 'ai');
         send.disabled = false;
         return;
       }
@@ -226,20 +185,27 @@
           method: 'POST',
           headers: {
             'Authorization': 'Bearer ' + API_KEY,
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'HTTP-Referer': window.location.origin,
+            'X-Title': 'Ramanujan Public School AI'
           },
           body: JSON.stringify({
             model: MODEL,
-            messages: [{ role: 'user', content: text }]
+            messages: [
+              { role: 'system', content: 'You are a helpful school assistant.' },
+              { role: 'user', content: text }
+            ]
           })
         });
 
         const data = await res.json();
 
-        if (data?.choices?.[0]?.message?.content) {
-          add(data.choices[0].message.content, 'ai');
+        if (data?.choices && data.choices.length > 0) {
+          add(data.choices[0].message.content.trim(), 'ai');
+        } else if (data?.error) {
+          add('API Error: ' + data.error.message, 'ai');
         } else {
-          add('No response received from AI.', 'ai');
+          add('AI returned no response.', 'ai');
         }
       } catch (e) {
         console.error(e);
@@ -249,7 +215,6 @@
       send.disabled = false;
     }
 
-    /* ================== EVENTS ================== */
     send.onclick = () => {
       const text = input.value.trim();
       if (!text) return;
@@ -262,8 +227,7 @@
       if (e.key === 'Enter') send.click();
     });
 
-    /* ================== WELCOME ================== */
-    add('Hello! I am Ramanujan Public School AI. You can use me offline or connect an API for full AI.', 'ai');
+    add('Hello! I can work offline or connect to live AI using an API key.', 'ai');
   </script>
 </body>
 </html>
