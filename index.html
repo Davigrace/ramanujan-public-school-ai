@@ -5,69 +5,81 @@
   <title>Ramanujan Public School AI</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
+  <!-- ===== KEEPING UI / BACKGROUND SIMPLE & STABLE ===== -->
   <style>
     body {
       margin: 0;
       font-family: Arial, sans-serif;
-      background: #0f172a;
+      background: linear-gradient(135deg, #020617, #0f172a);
       color: #e5e7eb;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
     }
 
     header {
       background: #020617;
-      padding: 16px;
+      padding: 14px;
       text-align: center;
       font-size: 22px;
       font-weight: bold;
     }
 
-    main {
-      max-width: 800px;
-      margin: 40px auto;
-      padding: 20px;
+    #chat {
+      flex: 1;
+      padding: 15px;
+      overflow-y: auto;
     }
 
-    textarea {
-      width: 100%;
-      height: 120px;
-      padding: 12px;
-      font-size: 16px;
+    .msg {
+      max-width: 75%;
+      margin-bottom: 12px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      white-space: pre-wrap;
+    }
+
+    .user {
+      background: #2563eb;
+      align-self: flex-end;
+      margin-left: auto;
+    }
+
+    .ai {
+      background: #020617;
+      border: 1px solid #1e293b;
+      align-self: flex-start;
+    }
+
+    footer {
+      display: flex;
+      padding: 10px;
+      gap: 10px;
+      background: #020617;
+    }
+
+    input {
+      flex: 1;
+      padding: 10px;
       border-radius: 8px;
       border: none;
       outline: none;
-      resize: none;
+      font-size: 15px;
     }
 
     button {
-      margin-top: 12px;
-      padding: 12px 20px;
-      font-size: 16px;
-      background: #2563eb;
-      color: white;
-      border: none;
+      padding: 10px 18px;
       border-radius: 8px;
+      border: none;
       cursor: pointer;
+      background: #2563eb;
+      color: #fff;
+      font-size: 15px;
     }
 
     button:disabled {
       background: #475569;
       cursor: not-allowed;
-    }
-
-    .output {
-      margin-top: 20px;
-      padding: 16px;
-      background: #020617;
-      border-radius: 8px;
-      min-height: 80px;
-      white-space: pre-wrap;
-    }
-
-    footer {
-      margin-top: 40px;
-      text-align: center;
-      font-size: 14px;
-      color: #94a3b8;
     }
   </style>
 </head>
@@ -75,97 +87,112 @@
 <body>
   <header>Ramanujan Public School AI</header>
 
-  <main>
-    <p>Ask an academic question:</p>
-
-    <textarea id="question" placeholder="Example: Explain Newton's first law in simple words"></textarea>
-
-    <button id="askBtn">Ask AI</button>
-
-    <div class="output" id="answer">Waiting for input...</div>
-  </main>
+  <div id="chat"></div>
 
   <footer>
-    Powered by Hugging Face (Mistral 7B)
+    <input id="input" placeholder="Ask a question…" />
+    <button id="send">Send</button>
   </footer>
 
   <script>
-    // ✅ BROWSER-SAFE MODEL
-    const API_URL =
-      "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2";
+    /* ================== OFFLINE KNOWLEDGE ================== */
+    const OFFLINE_DATA = {
+      "principal": "The principal of Ramanujan Public School is responsible for academic leadership.",
+      "school": "Ramanujan Public School focuses on discipline, academics, and holistic growth.",
+      "address": "Ramanujan Public School is located in India.",
+    };
 
-    let HF_API_KEY = "";
+    /* ================== CHAT HELPERS ================== */
+    const chat = document.getElementById('chat');
+    const input = document.getElementById('input');
+    const send = document.getElementById('send');
 
-    async function askAI() {
-      const question = document.getElementById("question").value.trim();
-      const answerBox = document.getElementById("answer");
-      const button = document.getElementById("askBtn");
+    function add(text, cls) {
+      const div = document.createElement('div');
+      div.className = 'msg ' + cls;
+      div.textContent = text;
+      chat.appendChild(div);
+      chat.scrollTop = chat.scrollHeight;
+    }
 
-      if (!question) {
-        answerBox.textContent = "Please enter a question.";
-        return;
-      }
+    /* ================== API CONFIG ================== */
+    const API_URL = 'https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2';
+    window.HF_API_KEY = "";
 
-      if (!HF_API_KEY) {
-        HF_API_KEY = prompt("Enter your Hugging Face API key:");
-        if (!HF_API_KEY) {
-          answerBox.textContent = "API key is required to continue.";
+    /* ================== MAIN LOGIC ================== */
+    async function ask(text) {
+      send.disabled = true;
+
+      // ---- OFFLINE MATCH ----
+      for (const key in OFFLINE_DATA) {
+        if (text.toLowerCase().includes(key)) {
+          add(OFFLINE_DATA[key], 'ai');
+          send.disabled = false;
           return;
         }
       }
 
-      button.disabled = true;
-      answerBox.textContent =
-        "AI is thinking...\n(First response may take 10–15 seconds)";
+      // ---- ASK FOR API KEY ONLY WHEN NEEDED ----
+      if (!window.HF_API_KEY) {
+        window.HF_API_KEY = prompt('Enter your Hugging Face API key:');
+        if (!window.HF_API_KEY) {
+          add('API key required to continue.', 'ai');
+          send.disabled = false;
+          return;
+        }
+      }
+
+      add('AI is thinking… (first response may take ~10 seconds)', 'ai');
 
       try {
-        const response = await fetch(API_URL, {
-          method: "POST",
+        const res = await fetch(API_URL, {
+          method: 'POST',
           headers: {
-            "Authorization": "Bearer " + HF_API_KEY,
-            "Content-Type": "application/json"
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + window.HF_API_KEY
           },
           body: JSON.stringify({
-            inputs: question,
-            parameters: {
-              max_new_tokens: 300,
-              temperature: 0.7
-            },
-            options: {
-              wait_for_model: true
-            }
+            inputs: text,
+            options: { wait_for_model: true }
           })
         });
 
-        if (!response.ok) {
-          const errorText = await response.text();
-          throw new Error(errorText);
-        }
+        const data = await res.json();
+        console.log('HF RESPONSE:', data);
 
-        const data = await response.json();
-
-        if (Array.isArray(data) && data[0]?.generated_text) {
-          answerBox.textContent = data[0].generated_text;
+        if (data?.error) {
+          add('⚠️ Model is waking up. Please retry in 10–20 seconds.', 'ai');
+        } else if (Array.isArray(data) && data[0]?.generated_text) {
+          add(data[0].generated_text, 'ai');
+        } else if (data?.generated_text) {
+          add(data.generated_text, 'ai');
         } else {
-          answerBox.textContent =
-            "No response received. Please try again.";
+          add('⚠️ No valid response. Try again.', 'ai');
         }
 
-      } catch (err) {
-        console.error(err);
-        answerBox.textContent =
-          "⚠️ Error contacting AI.\n\n" +
-          "Possible reasons:\n" +
-          "- Invalid or revoked API key\n" +
-          "- Model is waking up\n" +
-          "- Hugging Face temporary issue\n\n" +
-          "Wait 10 seconds and try again.";
+      } catch (e) {
+        console.error(e);
+        add('⚠️ Network / API error. Check key or connection.', 'ai');
       }
 
-      button.disabled = false;
+      send.disabled = false;
     }
 
-    document.getElementById("askBtn").addEventListener("click", askAI);
+    /* ================== EVENTS ================== */
+    send.onclick = () => {
+      const text = input.value.trim();
+      if (!text) return;
+      add(text, 'user');
+      input.value = '';
+      ask(text);
+    };
+
+    input.addEventListener('keydown', e => {
+      if (e.key === 'Enter') send.click();
+    });
+
+    /* ================== WELCOME ================== */
+    add('Hello! I am Ramanujan Public School AI. Ask me anything.', 'ai');
   </script>
 </body>
 </html>
