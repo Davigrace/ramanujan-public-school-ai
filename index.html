@@ -5,60 +5,117 @@
   <title>Ramanujan Public School AI</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- ===== KEEPING UI / BACKGROUND SIMPLE & STABLE ===== -->
+  <!-- ===== GLOBAL STYLES (same dark theme, background-first layout) ===== -->
   <style>
     body {
       margin: 0;
       font-family: Arial, sans-serif;
       background: linear-gradient(135deg, #020617, #0f172a);
       color: #e5e7eb;
+      height: 100vh;
+      display: flex;
+    }
+
+    /* ===== SIDEBAR (API KEY BOX) ===== */
+    .sidebar {
+      width: 260px;
+      background: #020617;
+      border-right: 1px solid #1e293b;
+      padding: 16px;
+      box-sizing: border-box;
+    }
+
+    .sidebar h3 {
+      margin-top: 0;
+      font-size: 18px;
+    }
+
+    .sidebar p {
+      font-size: 13px;
+      color: #94a3b8;
+    }
+
+    .sidebar input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 8px;
+      border-radius: 6px;
+      border: none;
+      outline: none;
+      font-size: 14px;
+    }
+
+    .sidebar button {
+      width: 100%;
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      background: #2563eb;
+      color: #fff;
+      font-size: 14px;
+    }
+
+    /* ===== MAIN APP ===== */
+    .app {
+      flex: 1;
       display: flex;
       flex-direction: column;
-      height: 100vh;
+      background-image: url('bg.png');
+      background-size: cover;
+      background-position: center;
     }
 
     header {
-      background: #020617;
-      padding: 14px;
-      text-align: center;
-      font-size: 22px;
+      background: rgba(2, 6, 23, 0.9);
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    header img {
+      height: 36px;
+    }
+
+    header span {
+      font-size: 20px;
       font-weight: bold;
     }
 
     #chat {
       flex: 1;
-      padding: 15px;
+      padding: 16px;
       overflow-y: auto;
     }
 
     .msg {
       max-width: 75%;
-      margin-bottom: 12px;
       padding: 10px 14px;
+      margin-bottom: 12px;
       border-radius: 10px;
       white-space: pre-wrap;
     }
 
     .user {
       background: #2563eb;
-      align-self: flex-end;
       margin-left: auto;
     }
 
     .ai {
-      background: #020617;
+      background: rgba(2, 6, 23, 0.85);
       border: 1px solid #1e293b;
-      align-self: flex-start;
     }
 
     footer {
       display: flex;
       padding: 10px;
       gap: 10px;
-      background: #020617;
+      background: rgba(2, 6, 23, 0.9);
     }
 
-    input {
+    footer input {
       flex: 1;
       padding: 10px;
       border-radius: 8px;
@@ -67,7 +124,7 @@
       font-size: 15px;
     }
 
-    button {
+    footer button {
       padding: 10px 18px;
       border-radius: 8px;
       border: none;
@@ -77,7 +134,7 @@
       font-size: 15px;
     }
 
-    button:disabled {
+    footer button:disabled {
       background: #475569;
       cursor: not-allowed;
     }
@@ -85,22 +142,49 @@
 </head>
 
 <body>
-  <header>Ramanujan Public School AI</header>
+  <!-- ===== API KEY SIDEBAR ===== -->
+  <div class="sidebar">
+    <h3>API Settings</h3>
+    <p style="font-size:12px;line-height:1.4">Paste your <b>OpenRouter API key</b> below. If left empty, the assistant works in <i>offline mode</i>.</p>
+    <input id="apiKeyInput" type="password" placeholder="sk-or-xxxxxxxx" />
+    <button onclick="saveKey()">Save & Use</button>
+  </div>
 
-  <div id="chat"></div>
+  <!-- ===== MAIN APPLICATION ===== -->
+  <div class="app">
+    <header>
+      <img src="assets/logo.png" alt="School Logo" />
+      <span>Ramanujan Public School AI</span>
+    </header>
 
-  <footer>
-    <input id="input" placeholder="Ask a question…" />
-    <button id="send">Send</button>
-  </footer>
+    <div id="chat"></div>
+
+    <footer>
+      <input id="input" placeholder="Ask a question…" />
+      <button id="send">Send</button>
+    </footer>
+  </div>
 
   <script>
-    /* ================== OFFLINE KNOWLEDGE ================== */
+    /* ================== LIMITED OFFLINE DATA ================== */
     const OFFLINE_DATA = {
-      "principal": "The principal of Ramanujan Public School is responsible for academic leadership.",
-      "school": "Ramanujan Public School focuses on discipline, academics, and holistic growth.",
+      "principal": "The principal of Ramanujan Public School oversees academic and administrative activities.",
+      "school": "Ramanujan Public School focuses on discipline, academics, and holistic student development.",
       "address": "Ramanujan Public School is located in India.",
     };
+
+    /* ================== OPENROUTER CONFIG ================== */
+    const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
+    const MODEL = "mistralai/mistral-7b-instruct";
+
+    let API_KEY = localStorage.getItem("OPENROUTER_KEY") || "";
+    document.getElementById("apiKeyInput").value = API_KEY;
+
+    function saveKey() {
+      API_KEY = document.getElementById("apiKeyInput").value.trim();
+      localStorage.setItem("OPENROUTER_KEY", API_KEY);
+      alert("API key saved.");
+    }
 
     /* ================== CHAT HELPERS ================== */
     const chat = document.getElementById('chat');
@@ -115,15 +199,11 @@
       chat.scrollTop = chat.scrollHeight;
     }
 
-    /* ================== API CONFIG ================== */
-    const API_URL = 'https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2';
-    window.HF_API_KEY = "";
-
-    /* ================== MAIN LOGIC ================== */
+    /* ================== MAIN ASK FUNCTION ================== */
     async function ask(text) {
       send.disabled = true;
 
-      // ---- OFFLINE MATCH ----
+      // ---- OFFLINE CHECK ----
       for (const key in OFFLINE_DATA) {
         if (text.toLowerCase().includes(key)) {
           add(OFFLINE_DATA[key], 'ai');
@@ -132,47 +212,38 @@
         }
       }
 
-      // ---- ASK FOR API KEY ONLY WHEN NEEDED ----
-      if (!window.HF_API_KEY) {
-        window.HF_API_KEY = prompt('Enter your Hugging Face API key:');
-        if (!window.HF_API_KEY) {
-          add('API key required to continue.', 'ai');
-          send.disabled = false;
-          return;
-        }
+      // ---- NO API KEY: OFFLINE-ONLY MODE ----
+      if (!API_KEY) {
+        add("Offline mode: no API key provided.", 'ai');
+        send.disabled = false;
+        return;
       }
 
-      add('AI is thinking… (first response may take ~10 seconds)', 'ai');
+      add('AI is thinking…', 'ai');
 
       try {
-        const res = await fetch(API_URL, {
+        const res = await fetch(OPENROUTER_URL, {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + window.HF_API_KEY
+            'Authorization': 'Bearer ' + API_KEY,
+            'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            inputs: text,
-            options: { wait_for_model: true }
+            model: MODEL,
+            messages: [{ role: 'user', content: text }]
           })
         });
 
         const data = await res.json();
-        console.log('HF RESPONSE:', data);
 
-        if (data?.error) {
-          add('⚠️ Model is waking up. Please retry in 10–20 seconds.', 'ai');
-        } else if (Array.isArray(data) && data[0]?.generated_text) {
-          add(data[0].generated_text, 'ai');
-        } else if (data?.generated_text) {
-          add(data.generated_text, 'ai');
+        if (data?.choices?.[0]?.message?.content) {
+          add(data.choices[0].message.content, 'ai');
         } else {
-          add('⚠️ No valid response. Try again.', 'ai');
+          add('No response received from AI.', 'ai');
         }
-
       } catch (e) {
         console.error(e);
-        add('⚠️ Network / API error. Check key or connection.', 'ai');
+        add('Network or API error.', 'ai');
       }
 
       send.disabled = false;
@@ -192,7 +263,7 @@
     });
 
     /* ================== WELCOME ================== */
-    add('Hello! I am Ramanujan Public School AI. Ask me anything.', 'ai');
+    add('Hello! I am Ramanujan Public School AI. You can use me offline or connect an API for full AI.', 'ai');
   </script>
 </body>
 </html>
