@@ -18,116 +18,464 @@
     }
     *{box-sizing:border-box}
     body{
-      margin:0; font-family:Inter,system-ui,Segoe UI,Roboto,Arial;
+      margin:0; 
+      font-family:Inter,system-ui,Segoe UI,Roboto,Arial;
       background:
         linear-gradient(rgba(15,18,32,.75), rgba(15,18,32,.75)),
         url('assets/images/bg.png') center/cover no-repeat;
       color:var(--text);
-      min-height:100vh; display:flex; align-items:center; justify-content:center;
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:20px;
     }
     .app{
-      width:min(980px, 94vw); height:min(620px, 90vh);
+      width:min(980px, 94vw); 
+      height:min(620px, 90vh);
       background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,0)),
                  var(--card);
-      border-radius:22px; box-shadow:0 30px 80px rgba(0,0,0,.45);
-      display:grid; grid-template-rows:auto 1fr auto; overflow:hidden;
+      border-radius:22px; 
+      box-shadow:0 30px 80px rgba(0,0,0,.45);
+      display:grid; 
+      grid-template-rows:auto 1fr auto; 
+      overflow:hidden;
+      position:relative;
     }
     header{
-      padding:18px 22px; display:flex; align-items:center; gap:12px;
+      padding:18px 22px; 
+      display:flex; 
+      align-items:center; 
+      gap:12px;
       border-bottom:1px solid rgba(255,255,255,.08);
+      position:relative;
     }
     .logo{
-      width:38px; height:38px; border-radius:10px;
+      width:38px; 
+      height:38px; 
+      border-radius:10px;
       background:rgba(255,255,255,.9);
-      display:grid; place-items:center;
+      display:grid; 
+      place-items:center;
       overflow:hidden;
     }
-    .logo img{width:100%; height:100%; object-fit:contain}
-    header h1{font-size:18px; margin:0}
-    header span{color:var(--muted); font-size:13px}
+    .logo img{
+      width:100%; 
+      height:100%; 
+      object-fit:contain;
+    }
+    header h1{
+      font-size:18px; 
+      margin:0;
+    }
+    header span{
+      color:var(--muted); 
+      font-size:13px;
+    }
+    
+    /* API Key Button in Header */
+    .api-key-btn{
+      margin-left:auto;
+      background:rgba(108, 242, 194, 0.1);
+      border:1px solid rgba(108, 242, 194, 0.3);
+      color:var(--accent);
+      padding:6px 12px;
+      border-radius:8px;
+      font-size:12px;
+      cursor:pointer;
+      transition:all 0.3s ease;
+    }
+    .api-key-btn:hover{
+      background:rgba(108, 242, 194, 0.2);
+    }
 
-    .chat{padding:18px; overflow:auto}
-    .msg{max-width:78%; margin-bottom:14px; padding:12px 14px; border-radius:14px; line-height:1.45}
-    .user{margin-left:auto; background:linear-gradient(135deg, #2a3170, #2d3aa6)}
-    .ai{background:#202661}
+    .chat{
+      padding:18px; 
+      overflow:auto;
+    }
+    .msg{
+      max-width:78%; 
+      margin-bottom:14px; 
+      padding:12px 14px; 
+      border-radius:14px; 
+      line-height:1.45;
+      word-wrap:break-word;
+    }
+    .user{
+      margin-left:auto; 
+      background:linear-gradient(135deg, #2a3170, #2d3aa6);
+    }
+    .ai{
+      background:#202661;
+    }
 
-    footer{padding:14px; border-top:1px solid rgba(255,255,255,.08)}
+    footer{
+      padding:14px; 
+      border-top:1px solid rgba(255,255,255,.08);
+    }
     .input{
-      display:flex; gap:10px; align-items:center;
-      background:#0e1230; padding:10px; border-radius:14px;
+      display:flex; 
+      gap:10px; 
+      align-items:center;
+      background:#0e1230; 
+      padding:10px; 
+      border-radius:14px;
     }
     input{
-      flex:1; background:transparent; border:none; outline:none; color:var(--text);
+      flex:1; 
+      background:transparent; 
+      border:none; 
+      outline:none; 
+      color:var(--text);
       font-size:14px;
     }
     button{
-      border:none; cursor:pointer; padding:10px 14px; border-radius:12px;
+      border:none; 
+      cursor:pointer; 
+      padding:10px 14px; 
+      border-radius:12px;
       background:linear-gradient(135deg, var(--accent), var(--accent2));
-      color:#071515; font-weight:700;
+      color:#071515; 
+      font-weight:700;
+      transition:opacity 0.3s ease;
     }
-    button:disabled{opacity:.6; cursor:not-allowed}
-    .hint{font-size:12px; color:var(--muted); margin-top:6px}
+    button:hover{
+      opacity:0.9;
+    }
+    button:disabled{
+      opacity:.6; 
+      cursor:not-allowed;
+    }
+    .hint{
+      font-size:12px; 
+      color:var(--muted); 
+      margin-top:6px;
+    }
 
-    /* API KEY MODAL */
-    .modal{position:fixed; inset:0; background:rgba(0,0,0,.65); display:none; place-items:center; z-index:999}
-    .modal-box{background:#161a35; padding:22px; border-radius:18px; width:min(420px, 90vw)}
-    .modal-box h3{margin-top:0}
+    /* API KEY DIALOG - Integrated into site */
+    .api-dialog{
+      position:absolute;
+      top:70px;
+      right:20px;
+      background:var(--card);
+      padding:20px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.15);
+      box-shadow:0 10px 40px rgba(0,0,0,.5);
+      width:320px;
+      z-index:100;
+      display:none;
+    }
+    .api-dialog.show{
+      display:block;
+      animation:fadeIn 0.3s ease;
+    }
+    @keyframes fadeIn{
+      from{opacity:0; transform:translateY(-10px);}
+      to{opacity:1; transform:translateY(0);}
+    }
+    .api-dialog h3{
+      margin:0 0 15px 0;
+      font-size:16px;
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+    .api-dialog h3:before{
+      content:"🔑";
+      font-size:14px;
+    }
+    .api-input-container{
+      display:flex;
+      gap:10px;
+      margin-bottom:12px;
+    }
+    .api-input{
+      flex:1;
+      background:rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.1);
+      border-radius:8px;
+      padding:10px 12px;
+      color:var(--text);
+      font-size:13px;
+      font-family:monospace;
+    }
+    .api-input:focus{
+      outline:none;
+      border-color:var(--accent);
+    }
+    .api-status{
+      font-size:12px;
+      margin-bottom:15px;
+      padding:8px;
+      border-radius:6px;
+      background:rgba(255,255,255,.05);
+    }
+    .api-status.valid{
+      color:var(--accent);
+      background:rgba(108, 242, 194, 0.1);
+    }
+    .api-status.invalid{
+      color:#ff7a7a;
+      background:rgba(255, 122, 122, 0.1);
+    }
+    .api-actions{
+      display:flex;
+      gap:8px;
+      justify-content:flex-end;
+    }
+    .api-actions button{
+      padding:8px 16px;
+      font-size:12px;
+    }
+    .api-actions .secondary{
+      background:rgba(255,255,255,.1);
+      color:var(--text);
+    }
+    .api-actions .secondary:hover{
+      background:rgba(255,255,255,.15);
+    }
+    .api-help{
+      font-size:11px;
+      color:var(--muted);
+      margin-top:12px;
+      line-height:1.4;
+    }
+    .api-help a{
+      color:var(--accent);
+      text-decoration:none;
+    }
+    .api-help a:hover{
+      text-decoration:underline;
+    }
+    
+    /* Loading animation */
+    .typing-indicator{
+      display:flex;
+      gap:4px;
+      padding:8px 12px;
+    }
+    .typing-indicator span{
+      width:8px;
+      height:8px;
+      background:var(--accent);
+      border-radius:50%;
+      animation:typing 1.4s infinite ease-in-out;
+    }
+    .typing-indicator span:nth-child(1){animation-delay:-0.32s;}
+    .typing-indicator span:nth-child(2){animation-delay:-0.16s;}
+    @keyframes typing{
+      0%, 80%, 100%{transform:scale(0.6); opacity:0.3;}
+      40%{transform:scale(1); opacity:1;}
+    }
+    
+    /* Close button for dialog */
+    .close-dialog{
+      position:absolute;
+      top:12px;
+      right:12px;
+      background:none;
+      border:none;
+      color:var(--muted);
+      font-size:18px;
+      cursor:pointer;
+      width:24px;
+      height:24px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      border-radius:50%;
+      transition:all 0.3s ease;
+    }
+    .close-dialog:hover{
+      background:rgba(255,255,255,.1);
+      color:var(--text);
+    }
   </style>
 </head>
 <body>
 
-<!-- API KEY DIALOG -->
-<div id="apiModal" class="modal">
-  <div class="modal-box">
-    <h3>Enter Google Gemini API Key</h3>
-    <input id="apiInput" placeholder="AIzaSy..." style="width:100%;margin:10px 0;padding:10px;border-radius:10px;border:none" />
-    <button id="saveKey" style="width:100%">Save API Key</button>
-    <p class="hint">Key is stored locally in this browser only.</p>
-  </div>
-</div>
-
 <div class="app">
+  <!-- API Key Dialog (integrated into site) -->
+  <div id="apiDialog" class="api-dialog">
+    <button class="close-dialog" id="closeDialog">×</button>
+    <h3>Gemini API Key</h3>
+    
+    <div class="api-input-container">
+      <input type="password" id="apiInput" class="api-input" placeholder="Enter your API key..." />
+      <button id="saveKey" class="small">Save</button>
+    </div>
+    
+    <div id="apiStatus" class="api-status">
+      Status: No API key saved
+    </div>
+    
+    <div class="api-actions">
+      <button id="clearKey" class="secondary">Clear Key</button>
+      <button id="testKey" class="secondary">Test Key</button>
+    </div>
+    
+    <div class="api-help">
+      Get your API key from 
+      <a href="https://makersuite.google.com/app/apikey" target="_blank">Google AI Studio</a>. 
+      Keys are stored locally in your browser only.
+    </div>
+  </div>
+
   <header>
     <div class="logo"><img src="assets/images/logo.png" alt="School Logo"></div>
     <div>
       <h1>Ramanujan School AI</h1>
       <span>Homework help • Concepts • Practice</span>
     </div>
+    <button class="api-key-btn" id="openApiDialog">
+      🔑 API Key
+    </button>
   </header>
 
   <div id="chat" class="chat">
-    <div class="msg ai">Hello! I’m Ramanujan School AI. Ask me any school question 🙂</div>
+    <div class="msg ai">Hello! I'm Ramanujan School AI. Ask me any school question 🙂</div>
   </div>
 
   <footer>
     <div class="input">
-      <input id="q" placeholder="Type your question…" />
+      <input id="q" placeholder="Type your question..." />
       <button id="send">Send</button>
     </div>
-    <div class="hint">Offline-first demo • Google Gemini 1.5 Flash</div>
+    <div class="hint">
+      <span id="modeIndicator">🔴 Offline Mode</span> • Google Gemini 1.5 Flash
+    </div>
   </footer>
 </div>
 
 <script>
   /* ======================================================
-     API KEY HANDLING (SEPARATE, SAFE FOR LOCAL USE)
+     API KEY HANDLING
   ====================================================== */
-  const modal = document.getElementById('apiModal');
+  let GEMINI_KEY = localStorage.getItem('GEMINI_API_KEY');
+  const dialog = document.getElementById('apiDialog');
+  const openBtn = document.getElementById('openApiDialog');
+  const closeBtn = document.getElementById('closeDialog');
   const apiInput = document.getElementById('apiInput');
   const saveKey = document.getElementById('saveKey');
+  const clearKey = document.getElementById('clearKey');
+  const testKey = document.getElementById('testKey');
+  const apiStatus = document.getElementById('apiStatus');
+  const modeIndicator = document.getElementById('modeIndicator');
 
-  let GEMINI_KEY = localStorage.getItem('GEMINI_API_KEY');
+  // Update status display
+  function updateApiStatus() {
+    if (GEMINI_KEY) {
+      // Show first 10 and last 4 characters of key for verification
+      const maskedKey = `${GEMINI_KEY.substring(0, 10)}...${GEMINI_KEY.substring(GEMINI_KEY.length - 4)}`;
+      apiStatus.textContent = `✅ API Key saved: ${maskedKey}`;
+      apiStatus.className = 'api-status valid';
+      modeIndicator.textContent = '🟢 Online Mode';
+      modeIndicator.style.color = '#6cf2c2';
+    } else {
+      apiStatus.textContent = '🔴 No API key saved (Offline mode only)';
+      apiStatus.className = 'api-status invalid';
+      modeIndicator.textContent = '🔴 Offline Mode';
+      modeIndicator.style.color = '#ff7a7a';
+    }
+  }
 
-  if(!GEMINI_KEY){ modal.style.display = 'grid'; }
+  // Initialize status
+  updateApiStatus();
 
-  saveKey.onclick = () => {
-    const v = apiInput.value.trim();
-    if(v){
-      localStorage.setItem('GEMINI_API_KEY', v);
-      GEMINI_KEY = v;
-      modal.style.display = 'none';
+  // Open/close dialog
+  openBtn.onclick = (e) => {
+    e.stopPropagation();
+    dialog.classList.toggle('show');
+    if (dialog.classList.contains('show')) {
+      apiInput.value = GEMINI_KEY || '';
+      apiInput.focus();
     }
   };
+
+  closeBtn.onclick = () => {
+    dialog.classList.remove('show');
+  };
+
+  // Close dialog when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!dialog.contains(e.target) && e.target !== openBtn) {
+      dialog.classList.remove('show');
+    }
+  });
+
+  // Save API key
+  saveKey.onclick = () => {
+    const v = apiInput.value.trim();
+    if (v) {
+      if (!v.startsWith('AIza')) {
+        apiStatus.textContent = '❌ Key should start with AIza...';
+        apiStatus.className = 'api-status invalid';
+        return;
+      }
+      localStorage.setItem('GEMINI_API_KEY', v);
+      GEMINI_KEY = v;
+      updateApiStatus();
+      dialog.classList.remove('show');
+      add('API key saved successfully! You can now use online features.', 'ai');
+    }
+  };
+
+  // Clear API key
+  clearKey.onclick = () => {
+    localStorage.removeItem('GEMINI_API_KEY');
+    GEMINI_KEY = null;
+    apiInput.value = '';
+    updateApiStatus();
+    add('API key cleared. Switching to offline mode.', 'ai');
+  };
+
+  // Test API key
+  testKey.onclick = async () => {
+    if (!GEMINI_KEY) {
+      apiStatus.textContent = '❌ No API key to test';
+      apiStatus.className = 'api-status invalid';
+      return;
+    }
+
+    apiStatus.textContent = '🔄 Testing API key...';
+    apiStatus.className = 'api-status';
+
+    try {
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{
+              role: 'user',
+              parts: [{ text: 'Say "API test successful" if you can read this.' }]
+            }]
+          })
+        }
+      );
+
+      if (response.ok) {
+        apiStatus.textContent = '✅ API key is working!';
+        apiStatus.className = 'api-status valid';
+      } else {
+        const error = await response.json();
+        apiStatus.textContent = `❌ API error: ${error.error?.message || 'Unknown error'}`;
+        apiStatus.className = 'api-status invalid';
+      }
+    } catch (err) {
+      apiStatus.textContent = '❌ Network error - check connection';
+      apiStatus.className = 'api-status invalid';
+    }
+  };
+
+  // Enter key to save
+  apiInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      saveKey.click();
+    }
+  });
 
   /* ======================================================
      CHAT LOGIC
@@ -150,76 +498,180 @@ The annual Rath Yatra is a major festival where the deities are taken out on mas
 Jagannath symbolizes universality, compassion, and inclusiveness.
 `;
 
-  function isGreeting(t){ return /^(hi|hello|hey|namaste)/i.test(t); }
-  function isHowAreYou(t){ return /(how are you|how r u)/i.test(t); }
-  function isJagannathQuery(t){ return /(jagannath|puri|rath yatra|nabakalebara|mahaprasad)/i.test(t); }
+  // Math knowledge base
+  const MATH_KB = {
+    'pythagoras': 'The Pythagorean theorem states: a² + b² = c², where c is the hypotenuse of a right triangle.',
+    'quadratic': 'The quadratic formula: x = [-b ± √(b² - 4ac)] / 2a',
+    'algebra': 'Algebra is the branch of mathematics dealing with symbols and rules for manipulating those symbols.',
+    'geometry': 'Geometry studies shapes, sizes, positions, and properties of space.',
+    'calculus': 'Calculus is the mathematical study of continuous change.'
+  };
 
-  function offlineReply(text){
-    if(isGreeting(text)) return 'Hello. How may I assist you today?';
-    if(isHowAreYou(text)) return 'I am functioning well. Thank you for asking.';
-    if(isJagannathQuery(text)) return JAGANNATH_KB;
+  function isGreeting(t) { 
+    return /^(hi|hello|hey|namaste|good morning|good afternoon|good evening)/i.test(t); 
+  }
+  
+  function isHowAreYou(t) { 
+    return /(how are you|how r u|how're you)/i.test(t); 
+  }
+  
+  function isJagannathQuery(t) { 
+    return /(jagannath|puri|rath yatra|nabakalebara|mahaprasad|balabhadra|subhadra)/i.test(t); 
+  }
+
+  function isMathQuery(t) {
+    const lower = t.toLowerCase();
+    for (const key in MATH_KB) {
+      if (lower.includes(key)) {
+        return MATH_KB[key];
+      }
+    }
     return null;
   }
 
-  function add(text, cls){
-    const d = document.createElement('div');
-    d.className = `msg ${cls}`;
-    d.textContent = text;
-    chat.appendChild(d);
-    chat.scrollTop = chat.scrollHeight;
+  function offlineReply(text) {
+    text = text.toLowerCase().trim();
+    if (isGreeting(text)) return 'Hello! How may I assist you with your studies today?';
+    if (isHowAreYou(text)) return 'I am functioning well. Ready to help with your questions!';
+    if (isJagannathQuery(text)) return JAGANNATH_KB;
+    
+    const mathReply = isMathQuery(text);
+    if (mathReply) return mathReply;
+    
+    if (text.includes('api') || text.includes('key')) {
+      return 'You can manage your API key by clicking the "API Key" button in the top right.';
+    }
+    
+    return null;
   }
 
-  async function ask(){
+  function add(text, cls, isTyping = false) {
+    const d = document.createElement('div');
+    d.className = `msg ${cls}`;
+    
+    if (isTyping) {
+      d.innerHTML = `<div class="typing-indicator"><span></span><span></span><span></span></div>`;
+      d.id = 'typing-msg';
+    } else {
+      // Simple formatting for newlines
+      d.textContent = text;
+    }
+    
+    chat.appendChild(d);
+    chat.scrollTop = chat.scrollHeight;
+    return d;
+  }
+
+  function removeTypingIndicator() {
+    const typingMsg = document.getElementById('typing-msg');
+    if (typingMsg) {
+      typingMsg.remove();
+    }
+  }
+
+  async function ask() {
     const text = q.value.trim();
-    if(!text) return;
+    if (!text) return;
 
     q.value = '';
     add(text, 'user');
     send.disabled = true;
+    q.disabled = true;
+
+    // Show typing indicator for online responses
+    let typingIndicator = null;
+    if (!offlineReply(text)) {
+      typingIndicator = add('', 'ai', true);
+    }
 
     // ===== OFFLINE FIRST =====
     const local = offlineReply(text);
-    if(local){
-      add(local, 'ai');
-      send.disabled = false;
+    if (local) {
+      setTimeout(() => {
+        removeTypingIndicator();
+        add(local, 'ai');
+        send.disabled = false;
+        q.disabled = false;
+        q.focus();
+      }, 500);
       return;
     }
 
     // ===== ONLINE (GEMINI) =====
-    try{
-      const res = await fetch(
+    // Check if API key exists
+    if (!GEMINI_KEY) {
+      removeTypingIndicator();
+      add('To answer this question, I need to use online features. Please add your Gemini API key by clicking the "API Key" button in the top right.', 'ai');
+      send.disabled = false;
+      q.disabled = false;
+      q.focus();
+      // Open dialog to prompt for API key
+      dialog.classList.add('show');
+      return;
+    }
+
+    try {
+      const response = await fetch(
         `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            contents: [
-              { role: 'user', parts: [{ text }] }
-            ]
+            contents: [{
+              role: 'user',
+              parts: [{ 
+                text: `You are Ramanujan School AI, a helpful assistant for students. Answer this question clearly and concisely: ${text}` 
+              }]
+            }],
+            generationConfig: {
+              temperature: 0.7,
+              maxOutputTokens: 500
+            }
           })
         }
       );
 
-      const data = await res.json();
-      console.log('GEMINI RESPONSE:', data);
-
-      if(data.error){
-        add('Gemini error: ' + data.error.message, 'ai');
+      removeTypingIndicator();
+      
+      if (!response.ok) {
+        const error = await response.json();
+        if (error.error?.code === 403 || error.error?.message?.includes('API key')) {
+          add('API key error. Please check your key is valid and has Gemini API access.', 'ai');
+          updateApiStatus();
+        } else {
+          add(`Error: ${error.error?.message || 'Unknown error'}`, 'ai');
+        }
       } else {
-        const reply = data.candidates?.[0]?.content?.parts?.[0]?.text;
-        add(reply || 'Gemini returned an empty response.', 'ai');
+        const data = await response.json();
+        const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || 
+                     'I received an empty response. Please try again.';
+        add(reply, 'ai');
       }
 
-    } catch(err){
-      console.error(err);
-      add('Network error. Please check your connection.', 'ai');
+    } catch (err) {
+      removeTypingIndicator();
+      console.error('Request failed:', err);
+      add('Network error. Please check your connection and try again.', 'ai');
     }
 
     send.disabled = false;
+    q.disabled = false;
+    q.focus();
   }
 
+  // Event listeners
   send.onclick = ask;
-  q.addEventListener('keydown', e => { if(e.key === 'Enter') ask(); });
+  q.addEventListener('keydown', e => { 
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      ask();
+    }
+  });
+
+  // Auto-focus input on load
+  window.addEventListener('load', () => {
+    q.focus();
+  });
 </script>
 </body>
 </html>
