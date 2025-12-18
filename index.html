@@ -8,6 +8,138 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
   <style>
+    /* ===== 1. STARTUP SCREEN & ANIMATIONS ===== */
+    #startupScreen {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(145deg, #0a0e1f 0%, #13172b 50%, #0f1220 100%);
+      color: var(--text);
+      z-index: 2000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .startup-slide {
+      text-align: center;
+      max-width: 900px;
+      width: 90%;
+      padding: 40px;
+      display: none;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    .startup-slide.active {
+      display: block;
+      animation: slideUpFadeIn 0.8s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+    }
+
+    @keyframes slideUpFadeIn {
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes logoPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    /* School Logo/Image Slide - IMAGE SIZE INCREASED HERE */
+    .school-logo-container {
+      margin: 0 auto 40px;
+      width: 320px; /* CHANGED: Increased from 180px */
+      height: 320px; /* CHANGED: Increased from 180px */
+      border-radius: 24px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      border: 1px solid rgba(108, 242, 194, 0.2);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+      animation: logoPulse 3s ease-in-out infinite;
+    }
+    .school-logo-container img {
+      max-width: 100%;
+      max-height: 100%;
+      border-radius: 12px;
+    }
+
+    /* Credits Slide */
+    .credits-title {
+      font-size: 3.5rem;
+      font-weight: 700;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin-bottom: 10px;
+      letter-spacing: -0.5px;
+    }
+    .credits-subtitle {
+      font-size: 1.2rem;
+      color: var(--muted);
+      margin-bottom: 50px;
+      font-weight: 300;
+    }
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 25px;
+      margin-bottom: 60px;
+    }
+    .team-member {
+      background: rgba(255, 255, 255, 0.03);
+      padding: 25px;
+      border-radius: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      transition: all 0.3s ease;
+    }
+    .team-member:hover {
+      transform: translateY(-8px);
+      background: rgba(108, 242, 194, 0.05);
+      border-color: rgba(108, 242, 194, 0.3);
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+    }
+    .member-name {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+    .member-role {
+      font-size: 0.95rem;
+      color: var(--accent);
+      font-weight: 500;
+      background: rgba(108, 242, 194, 0.1);
+      padding: 6px 14px;
+      border-radius: 100px;
+      display: inline-block;
+    }
+
+    /* Start Button */
+    .start-button {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #071515;
+      font-size: 1.3rem;
+      font-weight: 700;
+      padding: 20px 50px;
+      border: none;
+      border-radius: 16px;
+      cursor: pointer;
+      margin-top: 30px;
+      transition: all 0.3s ease;
+      box-shadow: 0 10px 30px rgba(108, 242, 194, 0.3);
+    }
+    .start-button:hover {
+      transform: scale(1.05) translateY(-5px);
+      box-shadow: 0 15px 40px rgba(108, 242, 194, 0.4);
+    }
+    .start-button:active {
+      transform: scale(0.98);
+    }
+
+    /* ===== 2. YOUR ORIGINAL APP STYLES (UNCHANGED) ===== */
     :root{
       --bg:#0f1220;
       --card:#161a35;
@@ -41,6 +173,12 @@
       grid-template-rows:auto 1fr auto;
       overflow:hidden;
       position:relative;
+      /* Smooth load animation for main app */
+      animation: appLoad 0.8s ease-out;
+    }
+    @keyframes appLoad {
+      from { opacity: 0; transform: translateY(20px) scale(0.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
     }
     header{
       padding:18px 22px;
@@ -72,8 +210,6 @@
       color:var(--muted);
       font-size:13px;
     }
-    
-    /* API Key Button in Header */
     .api-key-btn{
       margin-left:auto;
       background:rgba(108, 242, 194, 0.1);
@@ -88,7 +224,6 @@
     .api-key-btn:hover{
       background:rgba(108, 242, 194, 0.2);
     }
-
     .chat{
       padding:18px;
       overflow:auto;
@@ -100,6 +235,12 @@
       border-radius:14px;
       line-height:1.45;
       word-wrap:break-word;
+      /* Message animation */
+      animation: messageSlideIn 0.4s ease-out forwards;
+    }
+    @keyframes messageSlideIn {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
     }
     .user{
       margin-left:auto;
@@ -108,7 +249,6 @@
     .ai{
       background:#202661;
     }
-
     footer{
       padding:14px;
       border-top:1px solid rgba(255,255,255,.08);
@@ -128,6 +268,10 @@
       outline:none;
       color:var(--text);
       font-size:14px;
+      transition: box-shadow 0.2s ease;
+    }
+    input:focus {
+      box-shadow: 0 0 0 2px rgba(108, 242, 194, 0.4);
     }
     button{
       border:none;
@@ -137,22 +281,25 @@
       background:linear-gradient(135deg, var(--accent), var(--accent2));
       color:#071515;
       font-weight:700;
-      transition:opacity 0.3s ease;
+      transition:all 0.2s ease;
     }
     button:hover{
       opacity:0.9;
+      transform: translateY(-1px);
+    }
+    button:active{
+      transform: scale(0.96);
     }
     button:disabled{
       opacity:.6;
       cursor:not-allowed;
+      transform: none !important;
     }
     .hint{
       font-size:12px;
       color:var(--muted);
       margin-top:6px;
     }
-
-    /* API KEY DIALOG - Integrated into site */
     .api-dialog{
       position:absolute;
       top:70px;
@@ -165,14 +312,14 @@
       width:320px;
       z-index:100;
       display:none;
+      animation: dialogFadeIn 0.3s ease;
+    }
+    @keyframes dialogFadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
     .api-dialog.show{
       display:block;
-      animation:fadeIn 0.3s ease;
-    }
-    @keyframes fadeIn{
-      from{opacity:0; transform:translateY(-10px);}
-      to{opacity:1; transform:translateY(0);}
     }
     .api-dialog h3{
       margin:0 0 15px 0;
@@ -248,8 +395,6 @@
     .api-help a:hover{
       text-decoration:underline;
     }
-    
-    /* Loading animation */
     .typing-indicator{
       display:flex;
       gap:4px;
@@ -268,8 +413,6 @@
       0%, 80%, 100%{transform:scale(0.6); opacity:0.3;}
       40%{transform:scale(1); opacity:1;}
     }
-    
-    /* Close button for dialog */
     .close-dialog{
       position:absolute;
       top:12px;
@@ -294,59 +437,165 @@
   </style>
 </head>
 <body>
-<div class="app">
-  <!-- API Key Dialog -->
-  <div id="apiDialog" class="api-dialog">
-    <button class="close-dialog" id="closeDialog">×</button>
-    <h3>Groq API Key</h3>
-    <div class="api-input-container">
-      <input type="password" id="apiInput" class="api-input" placeholder="Enter your API key..." />
-      <button id="saveKey" class="small">Save</button>
+  <!-- ===== STARTUP SCREENS ===== -->
+  <div id="startupScreen">
+    <!-- Slide 1: School Information -->
+    <div class="startup-slide active" id="slideSchool">
+      <div class="school-logo-container">
+        <!-- YOUR UPLOADED IMAGE IS USED HERE -->
+        <img src="assets/images/images.png" alt="Ramanujan Public School" />
+      </div>
+      <h1 style="font-size: 2.8rem; margin-bottom: 15px;">Ramanujan Public School</h1>
+      <p style="font-size: 1.1rem; color: var(--muted); line-height: 1.7; max-width: 600px; margin: 0 auto 30px;">
+        Sanapur Urf Pepalgaon (Oppt. IIIT, Jhalwa)<br>
+        Allahabad-211012<br>
+        Phone: +91-7752922226<br>
+        E-mail: rpsjhalwa.all@gmail.com
+      </p>
+      <p style="font-size: 1.8rem; font-weight: 600; margin-top: 40px; color: var(--accent);">
+        Presents
+      </p>
+      <h2 style="font-size: 3rem; font-weight: 700; background: linear-gradient(90deg, #6cf2c2, #7aa2ff); -webkit-background-clip: text; background-clip: text; color: transparent; margin: 10px 0 40px 0;">
+        School AI Assistant
+      </h2>
+      <button class="start-button" onclick="showNextSlide()">
+        Meet the Team <span style="font-size: 1.2rem;">→</span>
+      </button>
     </div>
-    <div id="apiStatus" class="api-status">
-      Status: No API key saved
-    </div>
-    <div class="api-actions">
-      <button id="clearKey" class="secondary">Clear Key</button>
-      <button id="testKey" class="secondary">Test Key</button>
-    </div>
-    <div class="api-help">
-      Get your free API key from
-      <a href="https://console.groq.com" target="_blank">Groq Console</a>.
-      Keys are stored locally in your browser only.
+
+    <!-- Slide 2: Team Credits -->
+    <div class="startup-slide" id="slideTeam">
+      <div class="credits-title">Project Credits</div>
+      <div class="credits-subtitle">Built with dedication by the students of Class XI-B</div>
+
+      <div class="team-grid">
+        <!-- Team Members in the specified order -->
+        <div class="team-member">
+          <div class="member-name">Priyansh</div>
+          <div class="member-role">Developer & Presenter</div>
+        </div>
+        <div class="team-member">
+          <div class="member-name">Vansh</div>
+          <div class="member-role">Presenter</div>
+        </div>
+        <div class="team-member">
+          <div class="member-name">Shreyash</div>
+          <div class="member-role">Presenter</div>
+        </div>
+        <div class="team-member">
+          <div class="member-name">Sherya</div>
+          <div class="member-role">Presenter</div>
+        </div>
+        <div class="team-member">
+          <div class="member-name">Anshika</div>
+          <div class="member-role">Presenter</div>
+        </div>
+        <div class="team-member">
+          <div class="member-name">Ananya</div>
+          <div class="member-role">Presenter</div>
+        </div>
+        <div class="team-member">
+          <div class="member-name">Ankit</div>
+          <div class="member-role">Presenter</div>
+        </div>
+        <div class="team-member">
+          <div class="member-name">Kashfa</div>
+          <div class="member-role">Presenter</div>
+        </div>
+        <div class="team-member">
+          <div class="member-name">Utkarshini</div>
+          <div class="member-role">Presenter</div>
+        </div>
+      </div>
+
+      <button class="start-button" onclick="startChatApp()">
+        Start Chatting <span style="font-size: 1.2rem;">🚀</span>
+      </button>
     </div>
   </div>
 
-  <header>
-    <div class="logo"><img src="assets/images/logo.png" alt="School Logo"></div>
-    <div>
-      <h1>Ramanujan School AI</h1>
-      <span>Homework help • Concepts • Practice</span>
+  <!-- ===== YOUR ORIGINAL CHAT APP (HIDDEN INITIALLY) ===== -->
+  <div class="app" id="mainApp" style="display: none;">
+    <!-- API Key Dialog -->
+    <div id="apiDialog" class="api-dialog">
+      <button class="close-dialog" id="closeDialog">×</button>
+      <h3>Groq API Key</h3>
+      <div class="api-input-container">
+        <input type="password" id="apiInput" class="api-input" placeholder="Enter your API key..." />
+        <button id="saveKey" class="small">Save</button>
+      </div>
+      <div id="apiStatus" class="api-status">
+        Status: No API key saved
+      </div>
+      <div class="api-actions">
+        <button id="clearKey" class="secondary">Clear Key</button>
+        <button id="testKey" class="secondary">Test Key</button>
+      </div>
+      <div class="api-help">
+        Get your free API key from
+        <a href="https://console.groq.com" target="_blank">Groq Console</a>.
+        Keys are stored locally in your browser only.
+      </div>
     </div>
-    <button class="api-key-btn" id="openApiDialog">
-      🔑 API Key
-    </button>
-  </header>
 
-  <div id="chat" class="chat">
-    <div class="msg ai">Hello! I'm Ramanujan School AI. Ask me any school question 🙂</div>
+    <header>
+      <div class="logo"><img src="assets/images/logo.png" alt="School Logo"></div>
+      <div>
+        <h1>Ramanujan School AI</h1>
+        <span>Homework help • Concepts • Practice</span>
+      </div>
+      <button class="api-key-btn" id="openApiDialog">
+        🔑 API Key
+      </button>
+    </header>
+
+    <div id="chat" class="chat">
+      <div class="msg ai">Hello! I'm Ramanujan School AI. Ask me any school question 🙂</div>
+    </div>
+
+    <footer>
+      <div class="input">
+        <input id="q" placeholder="Type your question..." />
+        <button id="send">Send</button>
+      </div>
+      <div class="hint">
+        <span id="modeIndicator">🔴 Offline Mode</span>
+      </div>
+    </footer>
   </div>
-
-  <footer>
-    <div class="input">
-      <input id="q" placeholder="Type your question..." />
-      <button id="send">Send</button>
-    </div>
-    <div class="hint">
-      <span id="modeIndicator">🔴 Offline Mode</span>
-    </div>
-  </footer>
-</div>
 
 <script>
-  /* ======================================================
-     API KEY HANDLING
-  ====================================================== */
+  /* ===== STARTUP SCREEN LOGIC ===== */
+  let currentSlide = 0;
+  const slides = document.querySelectorAll('.startup-slide');
+
+  function showNextSlide() {
+    slides[currentSlide].classList.remove('active');
+    currentSlide++;
+    if (currentSlide < slides.length) {
+      slides[currentSlide].classList.add('active');
+    } else {
+      startChatApp();
+    }
+  }
+
+  function startChatApp() {
+    // 1. Animate out the startup screen
+    const startupScreen = document.getElementById('startupScreen');
+    startupScreen.style.opacity = '0';
+    startupScreen.style.transform = 'scale(1.05)';
+    startupScreen.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+
+    // 2. Wait for fade out, then hide it and show main app
+    setTimeout(() => {
+      startupScreen.style.display = 'none';
+      document.getElementById('mainApp').style.display = 'grid';
+      // Focus the input field for immediate typing
+      document.getElementById('q').focus();
+    }, 600);
+  }
+
+  /* ===== YOUR ORIGINAL CHAT APP JAVASCRIPT ===== */
   let GROQ_API_KEY = localStorage.getItem('GROQ_API_KEY');
   const dialog = document.getElementById('apiDialog');
   const openBtn = document.getElementById('openApiDialog');
@@ -429,7 +678,7 @@
         },
         body: JSON.stringify({
           messages: [{ role: 'user', content: 'Say "API test successful" if you can read this.' }],
-          model: 'llama-3.1-8b-instant' // Updated to current model
+          model: 'llama-3.1-8b-instant'
         })
       });
       if (response.ok) {
@@ -448,14 +697,10 @@
   };
   apiInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') saveKey.click(); });
 
-  /* ======================================================
-     CHAT LOGIC
-  ====================================================== */
   const chat = document.getElementById('chat');
   const q = document.getElementById('q');
   const send = document.getElementById('send');
 
-  // ===== OFFLINE KNOWLEDGE BASE =====
   const JAGANNATH_KB = `
 Lord Jagannath is a revered form of Lord Vishnu/Krishna, worshipped primarily in Odisha, India.
 He is traditionally worshipped along with his siblings: Lord Balabhadra and Devi Subhadra.
@@ -511,7 +756,6 @@ Jagannath symbolizes universality, compassion, and inclusiveness.
     if (typingMsg) typingMsg.remove();
   }
 
-  /* ===== MAIN ASK FUNCTION - UPDATED FOR GROQ API & MODEL ===== */
   async function ask() {
     const text = q.value.trim();
     if (!text) return;
@@ -563,7 +807,7 @@ Jagannath symbolizes universality, compassion, and inclusiveness.
               content: text
             }
           ],
-          model: 'llama-3.1-8b-instant', // Updated to a current, working model
+          model: 'llama-3.1-8b-instant',
           temperature: 0.7,
           max_tokens: 500
         })
@@ -603,7 +847,6 @@ Jagannath symbolizes universality, compassion, and inclusiveness.
       ask();
     }
   });
-  window.addEventListener('load', () => { q.focus(); });
 </script>
 </body>
 </html>
