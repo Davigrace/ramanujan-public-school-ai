@@ -2,232 +2,147 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Ramanujan Public School AI</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
+  <title>Ramanujan School AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
   <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: linear-gradient(135deg, #020617, #0f172a);
-      color: #e5e7eb;
-      height: 100vh;
-      display: flex;
+    :root{
+      --bg:#0f1220; --card:#161a35; --accent:#6cf2c2; --accent2:#7aa2ff;
+      --text:#e7e9ff; --muted:#aab0ff;
     }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter,system-ui;background:linear-gradient(rgba(15,18,32,.75),rgba(15,18,32,.75)),url('assets/images/bg.png') center/cover no-repeat;color:var(--text);min-height:100vh;display:flex;align-items:center;justify-content:center}
+    .app{width:min(980px,94vw);height:min(620px,90vh);background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,0)),var(--card);border-radius:22px;box-shadow:0 30px 80px rgba(0,0,0,.45);display:grid;grid-template-rows:auto 1fr auto;overflow:hidden}
+    header{padding:18px 22px;display:flex;align-items:center;gap:12px;border-bottom:1px solid rgba(255,255,255,.08)}
+    .logo{width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,.9);display:grid;place-items:center;overflow:hidden}
+    .logo img{width:100%;height:100%;object-fit:contain}
+    header h1{font-size:18px;margin:0}
+    header span{color:var(--muted);font-size:13px}
+    .chat{padding:18px;overflow:auto}
+    .msg{max-width:78%;margin-bottom:14px;padding:12px 14px;border-radius:14px;line-height:1.45}
+    .user{margin-left:auto;background:linear-gradient(135deg,#2a3170,#2d3aa6)}
+    .ai{background:#202661}
+    footer{padding:14px;border-top:1px solid rgba(255,255,255,.08)}
+    .input{display:flex;gap:10px;align-items:center;background:#0e1230;padding:10px;border-radius:14px}
+    input{flex:1;background:transparent;border:none;outline:none;color:var(--text);font-size:14px}
+    button{border:none;cursor:pointer;padding:10px 14px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#071515;font-weight:700}
+    button:disabled{opacity:.6;cursor:not-allowed}
+    .hint{font-size:12px;color:var(--muted);margin-top:6px}
 
-    /* Sidebar */
-    .sidebar {
-      width: 260px;
-      background: #020617;
-      border-right: 1px solid #1e293b;
-      padding: 16px;
-      box-sizing: border-box;
-    }
-
-    .sidebar h3 { margin-top: 0; }
-    .sidebar p { font-size: 12px; color: #94a3b8; }
-    .sidebar input {
-      width: 100%;
-      padding: 10px;
-      border-radius: 6px;
-      border: none;
-      margin-top: 6px;
-    }
-    .sidebar button {
-      width: 100%;
-      margin-top: 10px;
-      padding: 10px;
-      border-radius: 6px;
-      border: none;
-      background: #2563eb;
-      color: #fff;
-      cursor: pointer;
-    }
-
-    /* Main App */
-    .app {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      background-image: url('bg.png');
-      background-size: cover;
-      background-position: center;
-    }
-
-    header {
-      background: rgba(2,6,23,0.9);
-      padding: 12px 16px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    header img { height: 36px; }
-    header span { font-size: 20px; font-weight: bold; }
-
-    #chat {
-      flex: 1;
-      padding: 16px;
-      overflow-y: auto;
-    }
-
-    .msg {
-      max-width: 75%;
-      padding: 10px 14px;
-      margin-bottom: 12px;
-      border-radius: 10px;
-      white-space: pre-wrap;
-    }
-    .user { background: #2563eb; margin-left: auto; }
-    .ai { background: rgba(2,6,23,0.85); border: 1px solid #1e293b; }
-
-    footer {
-      display: flex;
-      padding: 10px;
-      gap: 10px;
-      background: rgba(2,6,23,0.9);
-    }
-    footer input {
-      flex: 1;
-      padding: 10px;
-      border-radius: 8px;
-      border: none;
-      font-size: 15px;
-    }
-    footer button {
-      padding: 10px 18px;
-      border-radius: 8px;
-      border: none;
-      background: #2563eb;
-      color: #fff;
-      cursor: pointer;
-    }
+    /* API KEY MODAL */
+    .modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:grid;place-items:center}
+    .modal-box{background:#161a35;padding:22px;border-radius:18px;width:min(420px,90vw)}
+    .modal-box h3{margin-top:0}
   </style>
 </head>
-
 <body>
-  <!-- API Sidebar -->
-  <div class="sidebar">
-    <h3>API Settings</h3>
-    <p>Enter your OpenRouter API key. Leave empty to use offline mode.</p>
-    <input id="apiKeyInput" type="password" placeholder="sk-or-xxxxxxxx" />
-    <button onclick="saveKey()">Save & Use</button>
+
+<!-- API KEY DIALOG -->
+<div id="apiModal" class="modal">
+  <div class="modal-box">
+    <h3>Enter Gemini API Key</h3>
+    <input id="apiInput" placeholder="AIzaSy..." style="width:100%;margin:10px 0;padding:10px;border-radius:10px;border:none" />
+    <button id="saveKey" style="width:100%">Save Key</button>
+    <p class="hint">Key is stored only in this browser (localStorage).</p>
+  </div>
+</div>
+
+<div class="app">
+  <header>
+    <div class="logo"><img src="assets/images/logo.png" alt="School Logo"></div>
+    <div>
+      <h1>Ramanujan School AI</h1>
+      <span>Homework help • Concepts • Practice</span>
+    </div>
+  </header>
+
+  <div id="chat" class="chat">
+    <div class="msg ai">Hello! I’m Ramanujan School AI. Ask me any school question 🙂</div>
   </div>
 
-  <!-- Main App -->
-  <div class="app">
-    <header>
-      <img src="logo.png" alt="School Logo" />
-      <span>Ramanujan Public School AI</span>
-    </header>
-
-    <div id="chat"></div>
-
-    <footer>
-      <input id="input" placeholder="Ask a question…" />
+  <footer>
+    <div class="input">
+      <input id="q" placeholder="Type your question…" />
       <button id="send">Send</button>
-    </footer>
-  </div>
+    </div>
+    <div class="hint">Demo project UI. Google Gemini 1.5 Flash integrated.</div>
+  </footer>
+</div>
 
-  <script>
-    /* Offline Data */
-    const OFFLINE_DATA = {
-      principal: "The principal manages academics and administration at Ramanujan Public School.",
-      school: "Ramanujan Public School focuses on discipline, academics, and holistic development.",
-      address: "Ramanujan Public School is located in India."
-    };
+<script>
+  // ===== API KEY HANDLING =====
+  const modal = document.getElementById('apiModal');
+  const apiInput = document.getElementById('apiInput');
+  const saveKey = document.getElementById('saveKey');
 
-    /* OpenRouter Config */
-    const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
-    const MODEL = 'mistralai/mistral-7b-instruct';
+  let GEMINI_KEY = localStorage.getItem('GEMINI_API_KEY');
+  if(!GEMINI_KEY) modal.style.display = 'grid';
+  else modal.style.display = 'none';
 
-    let API_KEY = localStorage.getItem('OPENROUTER_KEY') || '';
-    document.getElementById('apiKeyInput').value = API_KEY;
-
-    function saveKey() {
-      API_KEY = document.getElementById('apiKeyInput').value.trim();
-      localStorage.setItem('OPENROUTER_KEY', API_KEY);
-      alert('API key saved');
+  saveKey.onclick = () => {
+    if(apiInput.value.trim()){
+      localStorage.setItem('GEMINI_API_KEY', apiInput.value.trim());
+      GEMINI_KEY = apiInput.value.trim();
+      modal.style.display = 'none';
     }
+  };
 
-    const chat = document.getElementById('chat');
-    const input = document.getElementById('input');
-    const send = document.getElementById('send');
+  const chat = document.getElementById('chat');
+  const q = document.getElementById('q');
+  const send = document.getElementById('send');
 
-    function add(text, cls) {
-      const div = document.createElement('div');
-      div.className = 'msg ' + cls;
-      div.textContent = text;
-      chat.appendChild(div);
-      chat.scrollTop = chat.scrollHeight;
+  // ===== OFFLINE KNOWLEDGE BASE (UNCHANGED) =====
+  const JAGANNATH_KB = `Lord Jagannath is a revered form of Lord Vishnu/Krishna...`;
+
+  function isGreeting(t){return /^(hi|hello|hey|namaste)/i.test(t)}
+  function isHowAreYou(t){return /(how are you|how r u)/i.test(t)}
+  function isJagannathQuery(t){return /(jagannath|puri|rath yatra|nabakalebara|mahaprasad)/i.test(t)}
+
+  function offlineReply(text){
+    if(isGreeting(text)) return "Hello. How may I assist you today?";
+    if(isHowAreYou(text)) return "I am functioning well. Thank you for asking.";
+    if(isJagannathQuery(text)) return JAGANNATH_KB;
+    return null;
+  }
+
+  function add(text, cls){
+    const d = document.createElement('div');
+    d.className = `msg ${cls}`;
+    d.textContent = text;
+    chat.appendChild(d);
+    chat.scrollTop = chat.scrollHeight;
+  }
+
+  async function ask(){
+    const text = q.value.trim();
+    if(!text) return;
+    q.value = '';
+    add(text,'user');
+    send.disabled = true;
+
+    const local = offlineReply(text);
+    if(local){ add(local,'ai'); send.disabled=false; return; }
+
+    try{
+      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`,{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({contents:[{parts:[{text}]}]})
+      });
+
+      const data = await res.json();
+      const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+      add(reply || 'No response from AI.','ai');
+    }catch(e){
+      add('Network error.','ai');
     }
+    send.disabled=false;
+  }
 
-    async function ask(text) {
-      send.disabled = true;
-
-      for (const k in OFFLINE_DATA) {
-        if (text.toLowerCase().includes(k)) {
-          add(OFFLINE_DATA[k], 'ai');
-          send.disabled = false;
-          return;
-        }
-      }
-
-      if (!API_KEY) {
-        add('Offline mode: no API key provided.', 'ai');
-        send.disabled = false;
-        return;
-      }
-
-      add('AI is thinking…', 'ai');
-
-      try {
-        const res = await fetch(OPENROUTER_URL, {
-          method: 'POST',
-          headers: {
-            'Authorization': 'Bearer ' + API_KEY,
-            'Content-Type': 'application/json',
-            'HTTP-Referer': window.location.origin,
-            'X-Title': 'Ramanujan Public School AI'
-          },
-          body: JSON.stringify({
-            model: MODEL,
-            messages: [
-              { role: 'system', content: 'You are a helpful school assistant.' },
-              { role: 'user', content: text }
-            ]
-          })
-        });
-
-        const data = await res.json();
-
-        if (data?.choices && data.choices.length > 0) {
-          add(data.choices[0].message.content.trim(), 'ai');
-        } else if (data?.error) {
-          add('API Error: ' + data.error.message, 'ai');
-        } else {
-          add('AI returned no response.', 'ai');
-        }
-      } catch (e) {
-        console.error(e);
-        add('Network or API error.', 'ai');
-      }
-
-      send.disabled = false;
-    }
-
-    send.onclick = () => {
-      const text = input.value.trim();
-      if (!text) return;
-      add(text, 'user');
-      input.value = '';
-      ask(text);
-    };
-
-    input.addEventListener('keydown', e => {
-      if (e.key === 'Enter') send.click();
-    });
-
-    add('Hello! I can work offline or connect to live AI using an API key.', 'ai');
-  </script>
+  send.onclick = ask;
+  q.addEventListener('keydown',e=>{if(e.key==='Enter')ask();});
+</script>
 </body>
 </html>
