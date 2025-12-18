@@ -291,6 +291,16 @@
       background:rgba(255,255,255,.1);
       color:var(--text);
     }
+    
+    /* Warning message */
+    .warning-msg {
+      background: rgba(255, 193, 7, 0.1);
+      border-left: 3px solid #ffc107;
+      padding: 10px 14px;
+      margin: 10px 0;
+      border-radius: 0 8px 8px 0;
+      font-size: 13px;
+    }
   </style>
 </head>
 <body>
@@ -313,12 +323,13 @@
     <div class="api-actions">
       <button id="clearKey" class="secondary">Clear Key</button>
       <button id="testKey" class="secondary">Test Key</button>
+      <button id="listModels" class="secondary">List Models</button>
     </div>
     
     <div class="api-help">
-      Get your API key from 
+      Get your free API key from 
       <a href="https://makersuite.google.com/app/apikey" target="_blank">Google AI Studio</a>. 
-      Keys are stored locally in your browser only.
+      Free tier: ~20 requests/day. Keys are stored locally.
     </div>
   </div>
 
@@ -335,6 +346,9 @@
 
   <div id="chat" class="chat">
     <div class="msg ai">Hello! I'm Ramanujan School AI. Ask me any school question 🙂</div>
+    <div class="warning-msg">
+      <strong>Note:</strong> Using free Google AI Studio tier (~20 requests/day). For higher limits, consider alternatives like Groq or OpenRouter.
+    </div>
   </div>
 
   <footer>
@@ -343,7 +357,7 @@
       <button id="send">Send</button>
     </div>
     <div class="hint">
-      <span id="modeIndicator">🔴 Offline Mode</span> • Google Gemini 1.5 Flash
+      <span id="modeIndicator">🔴 Offline Mode</span> • Free Tier: ~20 requests/day
     </div>
   </footer>
 </div>
@@ -360,6 +374,7 @@
   const saveKey = document.getElementById('saveKey');
   const clearKey = document.getElementById('clearKey');
   const testKey = document.getElementById('testKey');
+  const listModelsBtn = document.getElementById('listModels');
   const apiStatus = document.getElementById('apiStatus');
   const modeIndicator = document.getElementById('modeIndicator');
 
@@ -370,7 +385,7 @@
       const maskedKey = `${GEMINI_KEY.substring(0, 10)}...${GEMINI_KEY.substring(GEMINI_KEY.length - 4)}`;
       apiStatus.textContent = `✅ API Key saved: ${maskedKey}`;
       apiStatus.className = 'api-status valid';
-      modeIndicator.textContent = '🟢 Online Mode';
+      modeIndicator.textContent = '🟢 Online Mode (Free Tier)';
       modeIndicator.style.color = '#6cf2c2';
     } else {
       apiStatus.textContent = '🔴 No API key saved (Offline mode only)';
@@ -442,8 +457,9 @@
     apiStatus.className = 'api-status';
 
     try {
+      // Using the correct model name for free tier
       const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`,
+        `https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -451,7 +467,11 @@
             contents: [{
               role: 'user',
               parts: [{ text: 'Say "API test successful" if you can read this.' }]
-            }]
+            }],
+            generationConfig: {
+              temperature: 0.7,
+              maxOutputTokens: 100
+            }
           })
         }
       );
@@ -461,7 +481,65 @@
         apiStatus.className = 'api-status valid';
       } else {
         const error = await response.json();
-        apiStatus.textContent = `❌ API error: ${error.error?.message || 'Unknown error'}`;
+        let errorMsg = `❌ API error: ${error.error?.message || 'Unknown error'}`;
+        
+        // Provide helpful suggestions for common errors
+        if (error.error?.message?.includes('not found') || error.error?.message?.includes('not supported')) {
+          errorMsg += '. Try using "gemini-2.5-flash-lite" instead.';
+        } else if (error.error?.message?.includes('quota')) {
+          errorMsg += '. You may have exceeded the free tier limit (~20 requests/day).';
+        }
+        
+        apiStatus.textContent = errorMsg;
+        apiStatus.className = 'api-status invalid';
+      }
+    } catch (err) {
+      apiStatus.textContent = '❌ Network error - check connection';
+      apiStatus.className = 'api-status invalid';
+    }
+  };
+
+  // List available models
+  listModelsBtn.onclick = async () => {
+    if (!GEMINI_KEY) {
+      apiStatus.textContent = '❌ No API key to list models';
+      apiStatus.className = 'api-status invalid';
+      return;
+    }
+
+    apiStatus.textContent = '🔄 Fetching available models...';
+    apiStatus.className = 'api-status';
+
+    try {
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1/models?key=${GEMINI_KEY}`
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        const models = data.models || [];
+        
+        // Filter for Gemini models that support generateContent
+        const geminiModels = models.filter(model => 
+          model.name.includes('gemini') && 
+          model.supportedGenerationMethods && 
+          model.supportedGenerationMethods.includes('generateContent')
+        );
+        
+        if (geminiModels.length > 0) {
+          const modelNames = geminiModels.map(m => m.name.split('/').pop()).join(', ');
+          apiStatus.textContent = `✅ Available Gemini models: ${modelNames}`;
+          apiStatus.className = 'api-status valid';
+          
+          // Show in chat too
+          add(`Available Gemini models for your key: ${modelNames}`, 'ai');
+        } else {
+          apiStatus.textContent = '❌ No Gemini models found with generateContent support';
+          apiStatus.className = 'api-status invalid';
+        }
+      } else {
+        const error = await response.json();
+        apiStatus.textContent = `❌ Error: ${error.error?.message || 'Unknown error'}`;
         apiStatus.className = 'api-status invalid';
       }
     } catch (err) {
@@ -512,7 +590,7 @@ Jagannath symbolizes universality, compassion, and inclusiveness.
   }
   
   function isHowAreYou(t) { 
-    return /(how are you|how r u|how're you)/i.test(t); 
+    return /(how are you|how r u|how\'re you)/i.test(t); 
   }
   
   function isJagannathQuery(t) { 
@@ -611,8 +689,10 @@ Jagannath symbolizes universality, compassion, and inclusiveness.
     }
 
     try {
+      // UPDATED: Using the correct model for free tier
+      const modelName = 'gemini-2.0-flash'; // Free tier model
       const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`,
+        `https://generativelanguage.googleapis.com/v1/models/${modelName}:generateContent?key=${GEMINI_KEY}`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -635,12 +715,21 @@ Jagannath symbolizes universality, compassion, and inclusiveness.
       
       if (!response.ok) {
         const error = await response.json();
+        let errorMsg = '';
+        
+        // Handle specific errors with helpful messages
         if (error.error?.code === 403 || error.error?.message?.includes('API key')) {
-          add('API key error. Please check your key is valid and has Gemini API access.', 'ai');
+          errorMsg = 'API key error. Please check your key is valid and has Gemini API access.';
           updateApiStatus();
+        } else if (error.error?.message?.includes('not found') || error.error?.message?.includes('not supported')) {
+          errorMsg = `Model "${modelName}" not found. Click "List Models" to see available options.`;
+        } else if (error.error?.message?.includes('quota') || error.error?.message?.includes('resource has been exhausted')) {
+          errorMsg = 'Free tier limit reached (~20 requests/day). Try again tomorrow or use offline mode.';
         } else {
-          add(`Error: ${error.error?.message || 'Unknown error'}`, 'ai');
+          errorMsg = `Error: ${error.error?.message || 'Unknown error'}`;
         }
+        
+        add(errorMsg, 'ai');
       } else {
         const data = await response.json();
         const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || 
