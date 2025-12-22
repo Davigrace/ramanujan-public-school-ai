@@ -252,6 +252,7 @@
     footer{
       padding:14px;
       border-top:1px solid rgba(255,255,255,.08);
+      position:relative;
     }
     .input{
       display:flex;
@@ -299,6 +300,9 @@
       font-size:12px;
       color:var(--muted);
       margin-top:6px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
     }
     .api-dialog{
       position:absolute;
@@ -434,6 +438,71 @@
       background:rgba(255,255,255,.1);
       color:var(--text);
     }
+    
+    /* Credits Dialog */
+    .credits-dialog{
+      position:absolute;
+      top:50%;
+      left:50%;
+      transform:translate(-50%, -50%);
+      background:var(--card);
+      padding:25px;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.15);
+      box-shadow:0 15px 50px rgba(0,0,0,.6);
+      width:400px;
+      max-width:90vw;
+      z-index:100;
+      display:none;
+      animation: dialogFadeIn 0.3s ease;
+    }
+    .credits-dialog.show{
+      display:block;
+    }
+    .credits-dialog h3{
+      margin:0 0 20px 0;
+      font-size:20px;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      color:var(--accent);
+    }
+    .credits-dialog h3:before{
+      content:"⭐";
+      font-size:18px;
+    }
+    .credits-content{
+      font-size:14px;
+      line-height:1.6;
+      color:var(--text);
+      margin-bottom:20px;
+    }
+    .credits-content p{
+      margin:0 0 15px 0;
+    }
+    .credits-content strong{
+      color:var(--accent);
+    }
+    .credits-close{
+      display:block;
+      margin-left:auto;
+      padding:8px 20px;
+      font-size:13px;
+    }
+    .credits-btn{
+      background:rgba(255,255,255,0.05);
+      border:1px solid rgba(255,255,255,0.1);
+      color:var(--muted);
+      padding:4px 10px;
+      border-radius:6px;
+      font-size:11px;
+      cursor:pointer;
+      transition:all 0.3s ease;
+    }
+    .credits-btn:hover{
+      background:rgba(255,255,255,0.1);
+      color:var(--text);
+    }
   </style>
 </head>
 <body>
@@ -538,6 +607,28 @@
       </div>
     </div>
 
+    <!-- Credits Dialog -->
+    <div id="creditsDialog" class="credits-dialog">
+      <button class="close-dialog" id="closeCreditsDialog">×</button>
+      <h3>Project Credits</h3>
+      <div class="credits-content">
+        <p>This AI Assistant was developed with the assistance of <strong>DeepSeek AI</strong>, which provided coding guidance and implementation support.</p>
+        
+        <p>The AI capabilities are powered by <strong>Groq Cloud API</strong> through the Groq Console, providing fast and efficient language model processing.</p>
+        
+        <p>All code was written by students of <strong>Class XI-B, Ramanujan Public School, Prayagraj, Jhalwa</strong> as an educational project.</p>
+        
+        <p>Features include:</p>
+        <ul style="margin: 10px 0 15px 20px; padding: 0;">
+          <li>Offline knowledge base for quick answers</li>
+          <li>Online AI integration via Groq API</li>
+          <li>Local browser storage for API keys</li>
+          <li>Responsive design for all devices</li>
+        </ul>
+      </div>
+      <button class="credits-close" id="closeCreditsBtn">Close</button>
+    </div>
+
     <header>
       <div class="logo"><img src="assets/images/logo.png" alt="School Logo"></div>
       <div>
@@ -560,6 +651,7 @@
       </div>
       <div class="hint">
         <span id="modeIndicator">🔴 Offline Mode</span>
+        <button class="credits-btn" id="openCreditsDialog">Credits</button>
       </div>
     </footer>
   </div>
@@ -606,6 +698,12 @@
   const testKey = document.getElementById('testKey');
   const apiStatus = document.getElementById('apiStatus');
   const modeIndicator = document.getElementById('modeIndicator');
+  
+  // Credits dialog elements
+  const creditsDialog = document.getElementById('creditsDialog');
+  const openCreditsBtn = document.getElementById('openCreditsDialog');
+  const closeCreditsBtn = document.getElementById('closeCreditsBtn');
+  const closeCreditsDialogBtn = document.getElementById('closeCreditsDialog');
 
   function updateApiStatus() {
     if (GROQ_API_KEY) {
@@ -624,6 +722,7 @@
 
   updateApiStatus();
 
+  // API Dialog functions
   openBtn.onclick = (e) => {
     e.stopPropagation();
     dialog.classList.toggle('show');
@@ -633,8 +732,20 @@
     }
   };
   closeBtn.onclick = () => { dialog.classList.remove('show'); };
+  
+  // Credits Dialog functions
+  openCreditsBtn.onclick = (e) => {
+    e.stopPropagation();
+    creditsDialog.classList.add('show');
+  };
+  
+  closeCreditsBtn.onclick = () => { creditsDialog.classList.remove('show'); };
+  closeCreditsDialogBtn.onclick = () => { creditsDialog.classList.remove('show'); };
+  
+  // Close dialogs when clicking outside
   document.addEventListener('click', (e) => {
     if (!dialog.contains(e.target) && e.target !== openBtn) { dialog.classList.remove('show'); }
+    if (!creditsDialog.contains(e.target) && e.target !== openCreditsBtn) { creditsDialog.classList.remove('show'); }
   });
 
   saveKey.onclick = () => {
@@ -737,6 +848,8 @@ Jagannath symbolizes universality, compassion, and inclusiveness.
     if (isJagannathQuery(text)) return JAGANNATH_KB;
     const mathReply = isMathQuery(text); if (mathReply) return mathReply;
     if (text.includes('api') || text.includes('key')) return 'You can manage your API key by clicking the "API Key" button in the top right.';
+    if (text.includes('credit') || text.includes('made by') || text.includes('who made') || text.includes('developed')) 
+      return 'I am Ramanujan School AI, made by a group of developers in Class XI-B of Ramanujan Public School, Prayagraj, Jhalwa. Click the "Credits" button below for more details.';
     return null;
   }
 
