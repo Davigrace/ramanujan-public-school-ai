@@ -45,11 +45,11 @@
       50% { transform: scale(1.05); }
     }
 
-    /* School Logo/Image Slide - IMAGE SIZE INCREASED HERE */
+    /* School Logo/Image Slide */
     .school-logo-container {
       margin: 0 auto 40px;
-      width: 320px; /* CHANGED: Increased from 180px */
-      height: 320px; /* CHANGED: Increased from 180px */
+      width: 320px;
+      height: 320px;
       border-radius: 24px;
       background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
       display: grid;
@@ -139,7 +139,7 @@
       transform: scale(0.98);
     }
 
-    /* ===== 2. YOUR ORIGINAL APP STYLES (UNCHANGED) ===== */
+    /* ===== 2. MAIN APP STYLES ===== */
     :root{
       --bg:#0f1220;
       --card:#161a35;
@@ -173,13 +173,14 @@
       grid-template-rows:auto 1fr auto;
       overflow:hidden;
       position:relative;
-      /* Smooth load animation for main app */
       animation: appLoad 0.8s ease-out;
     }
     @keyframes appLoad {
       from { opacity: 0; transform: translateY(20px) scale(0.98); }
       to { opacity: 1; transform: translateY(0) scale(1); }
     }
+    
+    /* Header */
     header{
       padding:18px 22px;
       display:flex;
@@ -210,8 +211,14 @@
       color:var(--muted);
       font-size:13px;
     }
-    .api-key-btn{
-      margin-left:auto;
+    
+    /* Action buttons */
+    .header-actions {
+      margin-left: auto;
+      display: flex;
+      gap: 10px;
+    }
+    .action-btn{
       background:rgba(108, 242, 194, 0.1);
       border:1px solid rgba(108, 242, 194, 0.3);
       color:var(--accent);
@@ -220,22 +227,36 @@
       font-size:12px;
       cursor:pointer;
       transition:all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 5px;
     }
-    .api-key-btn:hover{
+    .action-btn:hover{
       background:rgba(108, 242, 194, 0.2);
     }
+    .clear-btn {
+      background: rgba(255, 100, 100, 0.1);
+      border: 1px solid rgba(255, 100, 100, 0.3);
+      color: #ff7a7a;
+    }
+    .clear-btn:hover {
+      background: rgba(255, 100, 100, 0.2);
+    }
+    
+    /* Chat area */
     .chat{
       padding:18px;
-      overflow:auto;
+      overflow-y:auto;
+      display:flex;
+      flex-direction:column;
+      gap:14px;
     }
     .msg{
       max-width:78%;
-      margin-bottom:14px;
       padding:12px 14px;
       border-radius:14px;
       line-height:1.45;
       word-wrap:break-word;
-      /* Message animation */
       animation: messageSlideIn 0.4s ease-out forwards;
     }
     @keyframes messageSlideIn {
@@ -245,10 +266,14 @@
     .user{
       margin-left:auto;
       background:linear-gradient(135deg, #2a3170, #2d3aa6);
+      align-self: flex-end;
     }
     .ai{
       background:#202661;
+      align-self: flex-start;
     }
+    
+    /* Footer */
     footer{
       padding:14px;
       border-top:1px solid rgba(255,255,255,.08);
@@ -304,37 +329,58 @@
       justify-content:space-between;
       align-items:center;
     }
-    .api-dialog{
+    .credits-btn{
+      background:rgba(255,255,255,0.05);
+      border:1px solid rgba(255,255,255,0.1);
+      color:var(--muted);
+      padding:4px 10px;
+      border-radius:6px;
+      font-size:11px;
+      cursor:pointer;
+      transition:all 0.3s ease;
+    }
+    .credits-btn:hover{
+      background:rgba(255,255,255,0.1);
+      color:var(--text);
+    }
+    
+    /* Dialogs */
+    .api-dialog, .credits-dialog {
       position:absolute;
-      top:70px;
-      right:20px;
+      top:50%;
+      left:50%;
+      transform:translate(-50%, -50%);
       background:var(--card);
-      padding:20px;
-      border-radius:14px;
+      padding:25px;
+      border-radius:16px;
       border:1px solid rgba(255,255,255,.15);
-      box-shadow:0 10px 40px rgba(0,0,0,.5);
-      width:320px;
+      box-shadow:0 15px 50px rgba(0,0,0,.6);
+      width:400px;
+      max-width:90vw;
       z-index:100;
       display:none;
       animation: dialogFadeIn 0.3s ease;
     }
     @keyframes dialogFadeIn {
-      from { opacity: 0; transform: translateY(-10px); }
-      to { opacity: 1; transform: translateY(0); }
+      from { opacity: 0; transform: translateY(-10px) translate(-50%, -50%); }
+      to { opacity: 1; transform: translateY(0) translate(-50%, -50%); }
     }
-    .api-dialog.show{
+    .api-dialog.show, .credits-dialog.show {
       display:block;
     }
-    .api-dialog h3{
-      margin:0 0 15px 0;
-      font-size:16px;
+    
+    /* API Dialog specific */
+    .api-dialog h3, .credits-dialog h3 {
+      margin:0 0 20px 0;
+      font-size:20px;
       display:flex;
       align-items:center;
-      gap:8px;
+      gap:10px;
+      color:var(--accent);
     }
     .api-dialog h3:before{
       content:"🔑";
-      font-size:14px;
+      font-size:18px;
     }
     .api-input-container{
       display:flex;
@@ -399,24 +445,39 @@
     .api-help a:hover{
       text-decoration:underline;
     }
-    .typing-indicator{
-      display:flex;
-      gap:4px;
-      padding:8px 12px;
+    
+    /* Credits Dialog specific */
+    .credits-dialog h3:before{
+      content:"⭐";
+      font-size:18px;
     }
-    .typing-indicator span{
-      width:8px;
-      height:8px;
-      background:var(--accent);
-      border-radius:50%;
-      animation:typing 1.4s infinite ease-in-out;
+    .credits-content{
+      font-size:14px;
+      line-height:1.6;
+      color:var(--text);
+      margin-bottom:20px;
     }
-    .typing-indicator span:nth-child(1){animation-delay:-0.32s;}
-    .typing-indicator span:nth-child(2){animation-delay:-0.16s;}
-    @keyframes typing{
-      0%, 80%, 100%{transform:scale(0.6); opacity:0.3;}
-      40%{transform:scale(1); opacity:1;}
+    .credits-content p{
+      margin:0 0 15px 0;
     }
+    .credits-content strong{
+      color:var(--accent);
+    }
+    .credits-content ul {
+      margin: 10px 0 15px 20px;
+      padding: 0;
+    }
+    .credits-content li {
+      margin-bottom: 5px;
+    }
+    .credits-close{
+      display:block;
+      margin-left:auto;
+      padding:8px 20px;
+      font-size:13px;
+    }
+    
+    /* Close buttons */
     .close-dialog{
       position:absolute;
       top:12px;
@@ -439,69 +500,38 @@
       color:var(--text);
     }
     
-    /* Credits Dialog */
-    .credits-dialog{
-      position:absolute;
-      top:50%;
-      left:50%;
-      transform:translate(-50%, -50%);
-      background:var(--card);
-      padding:25px;
-      border-radius:16px;
-      border:1px solid rgba(255,255,255,.15);
-      box-shadow:0 15px 50px rgba(0,0,0,.6);
-      width:400px;
-      max-width:90vw;
-      z-index:100;
-      display:none;
-      animation: dialogFadeIn 0.3s ease;
-    }
-    .credits-dialog.show{
-      display:block;
-    }
-    .credits-dialog h3{
-      margin:0 0 20px 0;
-      font-size:20px;
+    /* Typing indicator */
+    .typing-indicator{
       display:flex;
-      align-items:center;
-      gap:10px;
-      color:var(--accent);
+      gap:4px;
+      padding:8px 12px;
     }
-    .credits-dialog h3:before{
-      content:"⭐";
-      font-size:18px;
+    .typing-indicator span{
+      width:8px;
+      height:8px;
+      background:var(--accent);
+      border-radius:50%;
+      animation:typing 1.4s infinite ease-in-out;
     }
-    .credits-content{
-      font-size:14px;
-      line-height:1.6;
-      color:var(--text);
-      margin-bottom:20px;
+    .typing-indicator span:nth-child(1){animation-delay:-0.32s;}
+    .typing-indicator span:nth-child(2){animation-delay:-0.16s;}
+    @keyframes typing{
+      0%, 80%, 100%{transform:scale(0.6); opacity:0.3;}
+      40%{transform:scale(1); opacity:1;}
     }
-    .credits-content p{
-      margin:0 0 15px 0;
-    }
-    .credits-content strong{
-      color:var(--accent);
-    }
-    .credits-close{
-      display:block;
-      margin-left:auto;
-      padding:8px 20px;
-      font-size:13px;
-    }
-    .credits-btn{
-      background:rgba(255,255,255,0.05);
-      border:1px solid rgba(255,255,255,0.1);
-      color:var(--muted);
-      padding:4px 10px;
-      border-radius:6px;
-      font-size:11px;
-      cursor:pointer;
-      transition:all 0.3s ease;
-    }
-    .credits-btn:hover{
-      background:rgba(255,255,255,0.1);
-      color:var(--text);
+    
+    /* Memory indicator */
+    .memory-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 10px;
+      background: rgba(108, 242, 194, 0.1);
+      border: 1px solid rgba(108, 242, 194, 0.2);
+      color: var(--accent);
+      margin-left: 10px;
     }
   </style>
 </head>
@@ -511,7 +541,6 @@
     <!-- Slide 1: School Information -->
     <div class="startup-slide active" id="slideSchool">
       <div class="school-logo-container">
-        <!-- YOUR UPLOADED IMAGE IS USED HERE -->
         <img src="assets/images/images.png" alt="Ramanujan Public School" />
       </div>
       <h1 style="font-size: 2.8rem; margin-bottom: 15px;">Ramanujan Public School</h1>
@@ -538,7 +567,6 @@
       <div class="credits-subtitle">Built with dedication by the students of Class XI-B</div>
 
       <div class="team-grid">
-        <!-- Team Members in the specified order -->
         <div class="team-member">
           <div class="member-name">Priyansh</div>
           <div class="member-role">Developer & Presenter</div>
@@ -583,7 +611,7 @@
     </div>
   </div>
 
-  <!-- ===== YOUR ORIGINAL CHAT APP (HIDDEN INITIALLY) ===== -->
+  <!-- ===== MAIN CHAT APP (HIDDEN INITIALLY) ===== -->
   <div class="app" id="mainApp" style="display: none;">
     <!-- API Key Dialog -->
     <div id="apiDialog" class="api-dialog">
@@ -619,12 +647,15 @@
         <p>All code was written by students of <strong>Class XI-B, Ramanujan Public School, Prayagraj, Jhalwa</strong> as an educational project.</p>
         
         <p>Features include:</p>
-        <ul style="margin: 10px 0 15px 20px; padding: 0;">
+        <ul>
+          <li>Conversation memory for context-aware responses</li>
           <li>Offline knowledge base for quick answers</li>
           <li>Online AI integration via Groq API</li>
           <li>Local browser storage for API keys</li>
           <li>Responsive design for all devices</li>
         </ul>
+        
+        <p><strong>Team Members:</strong> Priyansh (Developer & Presenter), Vansh, Shreyash, Sherya, Anshika, Ananya, Ankit, Kashfa, Utkarshini (All Presenters)</p>
       </div>
       <button class="credits-close" id="closeCreditsBtn">Close</button>
     </div>
@@ -632,16 +663,17 @@
     <header>
       <div class="logo"><img src="assets/images/logo.png" alt="School Logo"></div>
       <div>
-        <h1>Ramanujan School AI</h1>
+        <h1>Ramanujan School AI <span class="memory-badge">🎯 Context Aware</span></h1>
         <span>Homework help • Concepts • Practice</span>
       </div>
-      <button class="api-key-btn" id="openApiDialog">
-        🔑 API Key
-      </button>
+      <div class="header-actions">
+        <button class="action-btn clear-btn" id="clearChatBtn">🗑️ Clear Chat</button>
+        <button class="action-btn" id="openApiDialog">🔑 API Key</button>
+      </div>
     </header>
 
     <div id="chat" class="chat">
-      <div class="msg ai">Hello! I'm Ramanujan School AI. Ask me any school question 🙂</div>
+      <div class="msg ai">Hello! I'm Ramanujan School AI, created by students of Ramanujan Public School in Prayagraj, Jhalwa. I'll remember our conversation as we chat. Ask me anything! 🙂</div>
     </div>
 
     <footer>
@@ -651,7 +683,9 @@
       </div>
       <div class="hint">
         <span id="modeIndicator">🔴 Offline Mode</span>
-        <button class="credits-btn" id="openCreditsDialog">Credits</button>
+        <span>
+          <button class="credits-btn" id="openCreditsDialog">Credits</button>
+        </span>
       </div>
     </footer>
   </div>
@@ -672,23 +706,81 @@
   }
 
   function startChatApp() {
-    // 1. Animate out the startup screen
     const startupScreen = document.getElementById('startupScreen');
     startupScreen.style.opacity = '0';
     startupScreen.style.transform = 'scale(1.05)';
     startupScreen.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
 
-    // 2. Wait for fade out, then hide it and show main app
     setTimeout(() => {
       startupScreen.style.display = 'none';
       document.getElementById('mainApp').style.display = 'grid';
-      // Focus the input field for immediate typing
       document.getElementById('q').focus();
     }, 600);
   }
 
-  /* ===== YOUR ORIGINAL CHAT APP JAVASCRIPT ===== */
+  /* ===== CHAT APP LOGIC ===== */
+  
+  // Conversation memory system
+  class ConversationMemory {
+    constructor(maxMessages = 10) {
+      this.maxMessages = maxMessages;
+      this.messages = [];
+      this.loadFromStorage();
+    }
+    
+    addMessage(role, content) {
+      this.messages.push({ role, content, timestamp: Date.now() });
+      this.trimMemory();
+      this.saveToStorage();
+    }
+    
+    getContextMessages() {
+      return this.messages.slice(-this.maxMessages);
+    }
+    
+    clear() {
+      this.messages = [];
+      localStorage.removeItem('chat_memory');
+    }
+    
+    trimMemory() {
+      if (this.messages.length > this.maxMessages) {
+        this.messages = this.messages.slice(-this.maxMessages);
+      }
+    }
+    
+    saveToStorage() {
+      try {
+        localStorage.setItem('chat_memory', JSON.stringify(this.messages));
+      } catch (e) {
+        console.warn('Could not save chat memory:', e);
+      }
+    }
+    
+    loadFromStorage() {
+      try {
+        const saved = localStorage.getItem('chat_memory');
+        if (saved) {
+          this.messages = JSON.parse(saved);
+          this.trimMemory();
+        }
+      } catch (e) {
+        console.warn('Could not load chat memory:', e);
+      }
+    }
+    
+    getMessageCount() {
+      return this.messages.length;
+    }
+  }
+
+  // Initialize memory system
+  const conversationMemory = new ConversationMemory(15);
+  
+  // Global variables
   let GROQ_API_KEY = localStorage.getItem('GROQ_API_KEY');
+  
+  // DOM Elements
   const dialog = document.getElementById('apiDialog');
   const openBtn = document.getElementById('openApiDialog');
   const closeBtn = document.getElementById('closeDialog');
@@ -698,13 +790,16 @@
   const testKey = document.getElementById('testKey');
   const apiStatus = document.getElementById('apiStatus');
   const modeIndicator = document.getElementById('modeIndicator');
-  
-  // Credits dialog elements
   const creditsDialog = document.getElementById('creditsDialog');
   const openCreditsBtn = document.getElementById('openCreditsDialog');
   const closeCreditsBtn = document.getElementById('closeCreditsBtn');
   const closeCreditsDialogBtn = document.getElementById('closeCreditsDialog');
+  const chat = document.getElementById('chat');
+  const q = document.getElementById('q');
+  const send = document.getElementById('send');
+  const clearChatBtn = document.getElementById('clearChatBtn');
 
+  // Update API status
   function updateApiStatus() {
     if (GROQ_API_KEY) {
       const maskedKey = `${GROQ_API_KEY.substring(0, 10)}...${GROQ_API_KEY.substring(GROQ_API_KEY.length - 4)}`;
@@ -720,6 +815,7 @@
     }
   }
 
+  // Initialize UI
   updateApiStatus();
 
   // API Dialog functions
@@ -739,15 +835,28 @@
     creditsDialog.classList.add('show');
   };
   
-  closeCreditsBtn.onclick = () => { creditsDialog.classList.remove('show'); };
-  closeCreditsDialogBtn.onclick = () => { creditsDialog.classList.remove('show'); };
+  if (closeCreditsBtn) closeCreditsBtn.onclick = () => { creditsDialog.classList.remove('show'); };
+  if (closeCreditsDialogBtn) closeCreditsDialogBtn.onclick = () => { creditsDialog.classList.remove('show'); };
   
   // Close dialogs when clicking outside
   document.addEventListener('click', (e) => {
-    if (!dialog.contains(e.target) && e.target !== openBtn) { dialog.classList.remove('show'); }
-    if (!creditsDialog.contains(e.target) && e.target !== openCreditsBtn) { creditsDialog.classList.remove('show'); }
+    if (!dialog.contains(e.target) && e.target !== openBtn) { 
+      dialog.classList.remove('show'); 
+    }
+    if (creditsDialog && !creditsDialog.contains(e.target) && e.target !== openCreditsBtn) { 
+      creditsDialog.classList.remove('show'); 
+    }
   });
 
+  // Clear chat button
+  clearChatBtn.onclick = () => {
+    if (confirm('Clear all chat messages and conversation memory?')) {
+      chat.innerHTML = '<div class="msg ai">Chat cleared. Hello! I\'m Ramanujan School AI, created by students of Ramanujan Public School. Ask me anything! 🙂</div>';
+      conversationMemory.clear();
+    }
+  };
+
+  // API Key management
   saveKey.onclick = () => {
     const v = apiInput.value.trim();
     if (v) {
@@ -760,7 +869,7 @@
       GROQ_API_KEY = v;
       updateApiStatus();
       dialog.classList.remove('show');
-      add('Groq API key saved successfully! You can now use online features.', 'ai');
+      addMessageToChat('Groq API key saved successfully! You can now use online features.', 'ai');
     }
   };
 
@@ -769,7 +878,7 @@
     GROQ_API_KEY = null;
     apiInput.value = '';
     updateApiStatus();
-    add('API key cleared. Switching to offline mode.', 'ai');
+    addMessageToChat('API key cleared. Switching to offline mode.', 'ai');
   };
 
   testKey.onclick = async () => {
@@ -789,7 +898,8 @@
         },
         body: JSON.stringify({
           messages: [{ role: 'user', content: 'Say "API test successful" if you can read this.' }],
-          model: 'llama-3.1-8b-instant'
+          model: 'llama-3.1-8b-instant',
+          max_tokens: 20
         })
       });
       if (response.ok) {
@@ -806,85 +916,128 @@
       apiStatus.className = 'api-status invalid';
     }
   };
-  apiInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') saveKey.click(); });
+  
+  apiInput.addEventListener('keydown', (e) => { 
+    if (e.key === 'Enter') saveKey.click(); 
+  });
 
-  const chat = document.getElementById('chat');
-  const q = document.getElementById('q');
-  const send = document.getElementById('send');
+  // Knowledge base - Updated with accurate school information
+  const SCHOOL_KB = `Ramanujan Public School is a co-educational English-medium senior secondary school located in Jhalwa, Prayagraj (formerly Allahabad), Uttar Pradesh, India. It's affiliated with the Central Board of Secondary Education (CBSE) and offers classes from nursery up to class 12.
 
-  const JAGANNATH_KB = `
-Lord Jagannath is a revered form of Lord Vishnu/Krishna, worshipped primarily in Odisha, India.
+🏫 About the School
+• Founded: 1995 AD
+• Location: Sahapur Urf Peepalgaon, Opposite IIIT, Jhalwa, Prayagraj – 211012, Uttar Pradesh
+• Affiliation: CBSE (Affiliation number 2130472)
+• Contact: Phone: +91-7752922226, Email: rpsjhalwa.all@gmail.com
+
+📌 Founders / Managing Organization
+Ramanujan Public School was established by the Brij Nath Dina Nath (BNDN) Memorial Educational Society in memory of Lt. Brij Nath and Lt. Dr. Dina Nath. It was founded under the leadership of Dr. Gyan Chandra Srivastava, who is the Founder and Chairman of the Ramanujan Group of Educational Institutions (RGEI), which manages the school.
+
+This AI assistant was created by students of Class XI-B of Ramanujan Public School as an educational project.`;
+
+  const JAGANNATH_KB = `Lord Jagannath is a revered form of Lord Vishnu/Krishna, worshipped primarily in Odisha, India.
 He is traditionally worshipped along with his siblings: Lord Balabhadra and Devi Subhadra.
-
 Jagannath Puri Temple is one of the Char Dham pilgrimage sites of Hinduism and is located in Puri, Odisha.
-
 A unique feature of Jagannath worship is the wooden idols (daru brahma), which are ritually renewed in the Nabakalebara ceremony.
-
 The annual Rath Yatra is a major festival where the deities are taken out on massive chariots for public darshan.
-
-Jagannath symbolizes universality, compassion, and inclusiveness.
-`;
+Jagannath symbolizes universality, compassion, and inclusiveness.`;
 
   const MATH_KB = {
     'pythagoras': 'The Pythagorean theorem states: a² + b² = c², where c is the hypotenuse of a right triangle.',
     'quadratic': 'The quadratic formula: x = [-b ± √(b² - 4ac)] / 2a',
     'algebra': 'Algebra is the branch of mathematics dealing with symbols and rules for manipulating those symbols.',
     'geometry': 'Geometry studies shapes, sizes, positions, and properties of space.',
-    'calculus': 'Calculus is the mathematical study of continuous change.'
+    'calculus': 'Calculus is the mathematical study of continuous change.',
+    'trigonometry': 'Trigonometry deals with relationships between angles and sides of triangles.',
+    'statistics': 'Statistics is the study of data collection, analysis, interpretation, and presentation.',
+    'probability': 'Probability measures the likelihood of events occurring.'
   };
 
-  function isGreeting(t) { return /^(hi|hello|hey|namaste|good morning|good afternoon|good evening)/i.test(t); }
-  function isHowAreYou(t) { return /(how are you|how r u|how're you)/i.test(t); }
-  function isJagannathQuery(t) { return /(jagannath|puri|rath yatra|nabakalebara|mahaprasad|balabhadra|subhadra)/i.test(t); }
+  // Message handling functions
+  function isGreeting(t) { 
+    return /^(hi|hello|hey|namaste|good morning|good afternoon|good evening)/i.test(t); 
+  }
+  
+  function isHowAreYou(t) { 
+    return /(how are you|how r u|how're you)/i.test(t); 
+  }
+  
+  function isJagannathQuery(t) { 
+    return /(jagannath|puri|rath yatra|nabakalebara|mahaprasad|balabhadra|subhadra)/i.test(t); 
+  }
+  
+  function isSchoolQuery(t) {
+    return /(ramanujan|school|prayagraj|allahabad|jhalwa|cbse|bndn|gyan chandra|educational institution)/i.test(t);
+  }
+  
   function isMathQuery(t) {
     const lower = t.toLowerCase();
-    for (const key in MATH_KB) { if (lower.includes(key)) return MATH_KB[key]; }
+    for (const key in MATH_KB) {
+      if (lower.includes(key)) return MATH_KB[key];
+    }
     return null;
   }
+
+  // Offline reply function
   function offlineReply(text) {
     text = text.toLowerCase().trim();
     if (isGreeting(text)) return 'Hello! How may I assist you with your studies today?';
     if (isHowAreYou(text)) return 'I am functioning well. Ready to help with your questions!';
+    if (isSchoolQuery(text)) return SCHOOL_KB;
     if (isJagannathQuery(text)) return JAGANNATH_KB;
-    const mathReply = isMathQuery(text); if (mathReply) return mathReply;
+    const mathReply = isMathQuery(text); 
+    if (mathReply) return mathReply;
     if (text.includes('api') || text.includes('key')) return 'You can manage your API key by clicking the "API Key" button in the top right.';
     if (text.includes('credit') || text.includes('made by') || text.includes('who made') || text.includes('developed')) 
-      return 'I am Ramanujan School AI, made by a group of developers in Class XI-B of Ramanujan Public School, Prayagraj, Jhalwa. Click the "Credits" button below for more details.';
+      return 'I am Ramanujan School AI, created by students of Class XI-B at Ramanujan Public School, Prayagraj, Jhalwa. Click the "Credits" button below for more information.';
     return null;
   }
 
-  function add(text, cls, isTyping = false) {
+  // Add message to chat UI
+  function addMessageToChat(text, cls, isTyping = false) {
     const d = document.createElement('div');
     d.className = `msg ${cls}`;
     if (isTyping) {
       d.innerHTML = `<div class="typing-indicator"><span></span><span></span><span></span></div>`;
       d.id = 'typing-msg';
-    } else { d.textContent = text; }
+    } else { 
+      d.textContent = text; 
+    }
     chat.appendChild(d);
     chat.scrollTop = chat.scrollHeight;
     return d;
   }
+
   function removeTypingIndicator() {
     const typingMsg = document.getElementById('typing-msg');
     if (typingMsg) typingMsg.remove();
   }
 
+  // Main ask function with conversation memory
   async function ask() {
     const text = q.value.trim();
     if (!text) return;
+    
     q.value = '';
-    add(text, 'user');
+    
+    // Add user message to chat and memory
+    addMessageToChat(text, 'user');
+    conversationMemory.addMessage('user', text);
+    
     send.disabled = true;
     q.disabled = true;
 
     let typingIndicator = null;
-    if (!offlineReply(text)) typingIndicator = add('', 'ai', true);
-
-    const local = offlineReply(text);
-    if (local) {
+    
+    // Check for offline reply first
+    const localReply = offlineReply(text);
+    if (localReply) {
+      typingIndicator = addMessageToChat('', 'ai', true);
+      
       setTimeout(() => {
         removeTypingIndicator();
-        add(local, 'ai');
+        addMessageToChat(localReply, 'ai');
+        conversationMemory.addMessage('assistant', localReply);
         send.disabled = false;
         q.disabled = false;
         q.focus();
@@ -892,9 +1045,9 @@ Jagannath symbolizes universality, compassion, and inclusiveness.
       return;
     }
 
+    // If no offline reply and no API key
     if (!GROQ_API_KEY) {
-      removeTypingIndicator();
-      add('To answer this question, I need to use online features. Please add your Groq API key by clicking the "API Key" button in the top right.', 'ai');
+      addMessageToChat('To answer this question, I need to use online features. Please add your Groq API key by clicking the "API Key" button in the top right.', 'ai');
       send.disabled = false;
       q.disabled = false;
       q.focus();
@@ -902,7 +1055,27 @@ Jagannath symbolizes universality, compassion, and inclusiveness.
       return;
     }
 
+    // Show typing indicator for online request
+    typingIndicator = addMessageToChat('', 'ai', true);
+
     try {
+      // Build messages array with conversation history
+      const contextMessages = conversationMemory.getContextMessages();
+      const messages = [
+        {
+          role: 'system',
+          content: 'You are Ramanujan School AI, a helpful assistant created by students of Ramanujan Public School in Prayagraj, Jhalwa. Ramanujan Public School is a REAL educational institution founded in 1995, located in Sahapur Urf Peepalgaon, Opposite IIIT, Jhalwa, Prayagraj. It is a CBSE-affiliated school managed by the Brij Nath Dina Nath (BNDN) Memorial Educational Society. Answer questions clearly and concisely. Remember the conversation context to provide relevant follow-up answers. Never say the school is fictional or theoretical - it is a real school.'
+        },
+        ...contextMessages.map(msg => ({
+          role: msg.role === 'user' ? 'user' : 'assistant',
+          content: msg.content
+        })),
+        {
+          role: 'user',
+          content: text
+        }
+      ];
+
       const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -910,22 +1083,15 @@ Jagannath symbolizes universality, compassion, and inclusiveness.
           'Authorization': `Bearer ${GROQ_API_KEY}`
         },
         body: JSON.stringify({
-          messages: [
-            {
-              role: 'system',
-              content: 'You are Ramanujan School AI, a helpful assistant for students. Answer questions clearly and concisely.'
-            },
-            {
-              role: 'user',
-              content: text
-            }
-          ],
+          messages: messages,
           model: 'llama-3.1-8b-instant',
           temperature: 0.7,
           max_tokens: 500
         })
       });
+      
       removeTypingIndicator();
+      
       if (!response.ok) {
         const error = await response.json();
         let errorMsg = '';
@@ -937,22 +1103,25 @@ Jagannath symbolizes universality, compassion, and inclusiveness.
         } else {
           errorMsg = `Error: ${error.error?.message || 'Unknown error'}`;
         }
-        add(errorMsg, 'ai');
+        addMessageToChat(errorMsg, 'ai');
       } else {
         const data = await response.json();
         const reply = data.choices?.[0]?.message?.content || 'I received an empty response. Please try again.';
-        add(reply, 'ai');
+        addMessageToChat(reply, 'ai');
+        conversationMemory.addMessage('assistant', reply);
       }
     } catch (err) {
       removeTypingIndicator();
       console.error('Request failed:', err);
-      add('Network error. Please check your connection and try again.', 'ai');
+      addMessageToChat('Network error. Please check your connection and try again.', 'ai');
     }
+    
     send.disabled = false;
     q.disabled = false;
     q.focus();
   }
 
+  // Event listeners
   send.onclick = ask;
   q.addEventListener('keydown', e => {
     if (e.key === 'Enter' && !e.shiftKey) {
