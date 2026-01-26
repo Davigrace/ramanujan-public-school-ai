@@ -273,6 +273,78 @@
       align-self: flex-start;
     }
     
+    /* ===== 3. NEW: FORMATTED TEXT STYLES ===== */
+    .formatted-text {
+      line-height: 1.6;
+      font-size: 14px;
+    }
+    
+    .formatted-text p {
+      margin-bottom: 1em;
+    }
+    
+    .formatted-text ul, .formatted-text ol {
+      margin: 0.5em 0 0.5em 1.5em;
+      padding: 0;
+    }
+    
+    .formatted-text li {
+      margin-bottom: 0.5em;
+    }
+    
+    .formatted-text strong, .formatted-text b {
+      color: var(--accent);
+      font-weight: 600;
+    }
+    
+    .formatted-text em, .formatted-text i {
+      font-style: italic;
+    }
+    
+    .formatted-text h3, .formatted-text h4 {
+      margin: 1em 0 0.5em 0;
+      color: var(--accent);
+    }
+    
+    .formatted-text h3 {
+      font-size: 1.2em;
+      font-weight: 700;
+    }
+    
+    .formatted-text h4 {
+      font-size: 1.1em;
+      font-weight: 600;
+    }
+    
+    .formatted-text code {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 0.2em 0.4em;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 0.9em;
+    }
+    
+    .formatted-text blockquote {
+      border-left: 3px solid var(--accent);
+      padding-left: 1em;
+      margin: 1em 0;
+      color: var(--muted);
+      font-style: italic;
+    }
+    
+    .formatted-text .step {
+      margin: 1em 0;
+      padding-left: 1.5em;
+      position: relative;
+    }
+    
+    .formatted-text .step:before {
+      content: "→";
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+    }
+    
     /* Footer */
     footer{
       padding:14px;
@@ -580,7 +652,7 @@
           <div class="member-role">Presenter</div>
         </div>
         <div class="team-member">
-          <div class="member-name">Sherya</div>
+          <div class="member-name">Shreya</div>
           <div class="member-role">Presenter</div>
         </div>
         <div class="team-member">
@@ -653,9 +725,10 @@
           <li>Online AI integration via Groq API</li>
           <li>Local browser storage for API keys</li>
           <li>Responsive design for all devices</li>
+          <li>Properly formatted responses with spacing and lists</li>
         </ul>
         
-        <p><strong>Team Members:</strong> Priyansh (Developer & Presenter), Vansh, Shreyash, Sherya, Anshika, Ananya, Ankit, Kashfa, Utkarshini (All Presenters)</p>
+        <p><strong>Team Members:</strong> Priyansh (Developer & Presenter), Vansh, Shreyash, Shreya, Anshika, Ananya, Ankit, Kashfa, Utkarshini (All Presenters)</p>
       </div>
       <button class="credits-close" id="closeCreditsBtn">Close</button>
     </div>
@@ -673,7 +746,12 @@
     </header>
 
     <div id="chat" class="chat">
-      <div class="msg ai">Hello! I'm Ramanujan School AI, created by students of Ramanujan Public School in Prayagraj, Jhalwa. I'll remember our conversation as we chat. Ask me anything! 🙂</div>
+      <div class="msg ai">
+        <div class="formatted-text">
+          <p>Hello! I'm Ramanujan School AI, created by students of Ramanujan Public School in Prayagraj.</p>
+          <p>Ask me anything! 🙂</p>
+        </div>
+      </div>
     </div>
 
     <footer>
@@ -716,6 +794,77 @@
       document.getElementById('mainApp').style.display = 'grid';
       document.getElementById('q').focus();
     }, 600);
+  }
+
+  /* ===== TEXT FORMATTING FUNCTION ===== */
+  function formatTextForDisplay(text) {
+    // If it's already formatted (contains HTML), return as is
+    if (/<[a-z][\s\S]*>/i.test(text)) {
+      return text;
+    }
+    
+    let formattedText = text;
+    
+    // 1. Replace markdown-style headings
+    formattedText = formattedText.replace(/^### (.*$)/gim, '<h4>$1</h4>');
+    formattedText = formattedText.replace(/^## (.*$)/gim, '<h3>$1</h3>');
+    formattedText = formattedText.replace(/^# (.*$)/gim, '<h3>$1</h3>');
+    
+    // 2. Replace markdown bold and italic
+    formattedText = formattedText.replace(/\*\*\*(.*?)\*\*\*/g, '<strong><em>$1</em></strong>');
+    formattedText = formattedText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    formattedText = formattedText.replace(/\*(.*?)\*/g, '<em>$1</em>');
+    
+    // 3. Handle numbered lists (1., 2., etc.)
+    formattedText = formattedText.replace(/^(\d+)\.\s+(.*$)/gim, '<li><strong>$1.</strong> $2</li>');
+    
+    // 4. Handle bullet points (*, -, •)
+    formattedText = formattedText.replace(/^[\*\-\•]\s+(.*$)/gim, '<li>$1</li>');
+    
+    // 5. Wrap lists in proper HTML
+    if (formattedText.includes('<li>')) {
+      // Check if it starts with numbers (ordered list)
+      if (formattedText.match(/^<li><strong>\d+\./)) {
+        formattedText = formattedText.replace(/<li>/g, '<li>');
+        formattedText = '<ol>' + formattedText + '</ol>';
+      } else {
+        formattedText = '<ul>' + formattedText + '</ul>';
+      }
+    }
+    
+    // 6. Handle code blocks
+    formattedText = formattedText.replace(/`([^`]+)`/g, '<code>$1</code>');
+    
+    // 7. Split into paragraphs (double newlines)
+    let paragraphs = formattedText.split(/\n\s*\n/);
+    
+    // 8. Process each paragraph
+    paragraphs = paragraphs.map(para => {
+      para = para.trim();
+      if (!para) return '';
+      
+      // If paragraph already starts with HTML tag, leave it
+      if (para.startsWith('<')) {
+        return para;
+      }
+      
+      // If it's a short line (might be heading or list item), don't wrap in p
+      if (para.length < 100 && (para.includes('<h') || para.includes('<li>'))) {
+        return para;
+      }
+      
+      // Wrap in paragraph tag
+      return '<p>' + para + '</p>';
+    });
+    
+    // 9. Join paragraphs
+    formattedText = paragraphs.filter(p => p).join('');
+    
+    // 10. Clean up multiple line breaks within paragraphs
+    formattedText = formattedText.replace(/\n/g, '<br>');
+    
+    // 11. Add the formatted-text class wrapper
+    return '<div class="formatted-text">' + formattedText + '</div>';
   }
 
   /* ===== CHAT APP LOGIC ===== */
@@ -851,7 +1000,7 @@
   // Clear chat button
   clearChatBtn.onclick = () => {
     if (confirm('Clear all chat messages and conversation memory?')) {
-      chat.innerHTML = '<div class="msg ai">Chat cleared. Hello! I\'m Ramanujan School AI, created by students of Ramanujan Public School. Ask me anything! 🙂</div>';
+      chat.innerHTML = '<div class="msg ai"><div class="formatted-text"><p>Hello! I\'m Ramanujan School AI, created by students of Ramanujan Public School in Prayagraj, Jhalwa. I\'ll remember our conversation as we chat.</p><p><strong>New Feature:</strong> My responses are now properly formatted with:</p><ul><li>Clear paragraph spacing</li><li>Numbered and bulleted lists</li><li>Proper headings and emphasis</li><li>Code formatting</li><li>Readable text structure</li></ul><p>Ask me anything! 🙂</p></div></div>';
       conversationMemory.clear();
     }
   };
@@ -936,21 +1085,25 @@ Ramanujan Public School was established by the Brij Nath Dina Nath (BNDN) Memori
 This AI assistant was created by students of Class XI-B of Ramanujan Public School as an educational project.`;
 
   const JAGANNATH_KB = `Lord Jagannath is a revered form of Lord Vishnu/Krishna, worshipped primarily in Odisha, India.
+
 He is traditionally worshipped along with his siblings: Lord Balabhadra and Devi Subhadra.
-Jagannath Puri Temple is one of the Char Dham pilgrimage sites of Hinduism and is located in Puri, Odisha.
-A unique feature of Jagannath worship is the wooden idols (daru brahma), which are ritually renewed in the Nabakalebara ceremony.
-The annual Rath Yatra is a major festival where the deities are taken out on massive chariots for public darshan.
-Jagannath symbolizes universality, compassion, and inclusiveness.`;
+
+**Key Information:**
+1. **Temple**: Jagannath Puri Temple is one of the Char Dham pilgrimage sites of Hinduism
+2. **Location**: Located in Puri, Odisha
+3. **Unique Feature**: Wooden idols (daru brahma), ritually renewed in the Nabakalebara ceremony
+4. **Festival**: Annual Rath Yatra where deities are taken out on massive chariots
+5. **Symbolism**: Represents universality, compassion, and inclusiveness`;
 
   const MATH_KB = {
-    'pythagoras': 'The Pythagorean theorem states: a² + b² = c², where c is the hypotenuse of a right triangle.',
-    'quadratic': 'The quadratic formula: x = [-b ± √(b² - 4ac)] / 2a',
-    'algebra': 'Algebra is the branch of mathematics dealing with symbols and rules for manipulating those symbols.',
-    'geometry': 'Geometry studies shapes, sizes, positions, and properties of space.',
-    'calculus': 'Calculus is the mathematical study of continuous change.',
-    'trigonometry': 'Trigonometry deals with relationships between angles and sides of triangles.',
-    'statistics': 'Statistics is the study of data collection, analysis, interpretation, and presentation.',
-    'probability': 'Probability measures the likelihood of events occurring.'
+    'pythagoras': '**Pythagorean Theorem**: a² + b² = c²\n\nWhere:\n- c is the hypotenuse of a right triangle\n- a and b are the other two sides',
+    'quadratic': '**Quadratic Formula**: x = [-b ± √(b² - 4ac)] / 2a\n\nUsed to solve equations of form: ax² + bx + c = 0',
+    'algebra': '**Algebra**: Branch of mathematics dealing with symbols and rules for manipulating those symbols.\n\n**Key Concepts**:\n- Variables and equations\n- Polynomials\n- Functions and graphs',
+    'geometry': '**Geometry**: Studies shapes, sizes, positions, and properties of space.\n\n**Main Areas**:\n1. Plane geometry (2D shapes)\n2. Solid geometry (3D shapes)\n3. Coordinate geometry',
+    'calculus': '**Calculus**: Mathematical study of continuous change.\n\n**Two Main Branches**:\n1. Differential calculus (rates of change)\n2. Integral calculus (accumulation of quantities)',
+    'trigonometry': '**Trigonometry**: Branch of mathematics dealing with relationships between angles and sides of triangles.\n\n**Key Functions**:\n- Sine (sin)\n- Cosine (cos)\n- Tangent (tan)\n- And their reciprocals',
+    'statistics': '**Statistics**: Science of collecting, analyzing, interpreting, and presenting data.\n\n**Key Concepts**:\n- Mean, median, mode\n- Standard deviation\n- Probability distributions',
+    'probability': '**Probability**: Branch of mathematics concerning numerical descriptions of how likely an event is to occur.\n\n**Basic Formula**: P(A) = Number of favorable outcomes / Total number of outcomes'
   };
 
   // Message handling functions
@@ -993,16 +1146,19 @@ Jagannath symbolizes universality, compassion, and inclusiveness.`;
     return null;
   }
 
-  // Add message to chat UI
+  // Add message to chat UI with formatting
   function addMessageToChat(text, cls, isTyping = false) {
     const d = document.createElement('div');
     d.className = `msg ${cls}`;
+    
     if (isTyping) {
       d.innerHTML = `<div class="typing-indicator"><span></span><span></span><span></span></div>`;
       d.id = 'typing-msg';
     } else { 
-      d.textContent = text; 
+      // Format the text before adding
+      d.innerHTML = formatTextForDisplay(text);
     }
+    
     chat.appendChild(d);
     chat.scrollTop = chat.scrollHeight;
     return d;
@@ -1064,7 +1220,7 @@ Jagannath symbolizes universality, compassion, and inclusiveness.`;
       const messages = [
         {
           role: 'system',
-          content: 'You are Ramanujan School AI, a helpful assistant created by students of Ramanujan Public School in Prayagraj, Jhalwa. Ramanujan Public School is a REAL educational institution founded in 1995, located in Sahapur Urf Peepalgaon, Opposite IIIT, Jhalwa, Prayagraj. It is a CBSE-affiliated school managed by the Brij Nath Dina Nath (BNDN) Memorial Educational Society. Answer questions clearly and concisely. Remember the conversation context to provide relevant follow-up answers. Never say the school is fictional or theoretical - it is a real school.'
+          content: 'You are Ramanujan School AI, a helpful assistant created by students of Ramanujan Public School in Prayagraj, Jhalwa. Ramanujan Public School is a REAL educational institution founded in 1995, located in Sahapur Urf Peepalgaon, Opposite IIIT, Jhalwa, Prayagraj. It is a CBSE-affiliated school managed by the Brij Nath Dina Nath (BNDN) Memorial Educational Society. Format your answers with proper paragraphs, lists, and spacing. Use markdown formatting for headings (**bold** for emphasis, *italics* for emphasis, ### for subheadings, and bullet points or numbered lists where appropriate). Make responses clear, educational, and well-structured. Never say the school is fictional or theoretical - it is a real school.'
         },
         ...contextMessages.map(msg => ({
           role: msg.role === 'user' ? 'user' : 'assistant',
@@ -1086,7 +1242,7 @@ Jagannath symbolizes universality, compassion, and inclusiveness.`;
           messages: messages,
           model: 'llama-3.1-8b-instant',
           temperature: 0.7,
-          max_tokens: 500
+          max_tokens: 800
         })
       });
       
@@ -1096,12 +1252,12 @@ Jagannath symbolizes universality, compassion, and inclusiveness.`;
         const error = await response.json();
         let errorMsg = '';
         if (error.error?.type === 'invalid_request_error') {
-          errorMsg = 'API key error. Please check your key is valid.';
+          errorMsg = '**API Key Error**\n\nPlease check your API key is valid.';
           updateApiStatus();
         } else if (error.error?.code === 'rate_limit_exceeded') {
-          errorMsg = 'Rate limit reached. Please wait a moment.';
+          errorMsg = '**Rate Limit Reached**\n\nPlease wait a moment before sending more questions.';
         } else {
-          errorMsg = `Error: ${error.error?.message || 'Unknown error'}`;
+          errorMsg = `**Error**: ${error.error?.message || 'Unknown error'}`;
         }
         addMessageToChat(errorMsg, 'ai');
       } else {
@@ -1113,7 +1269,7 @@ Jagannath symbolizes universality, compassion, and inclusiveness.`;
     } catch (err) {
       removeTypingIndicator();
       console.error('Request failed:', err);
-      addMessageToChat('Network error. Please check your connection and try again.', 'ai');
+      addMessageToChat('**Network Error**\n\nPlease check your connection and try again.', 'ai');
     }
     
     send.disabled = false;
