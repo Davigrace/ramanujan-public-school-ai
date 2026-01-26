@@ -217,6 +217,7 @@
       margin-left: auto;
       display: flex;
       gap: 10px;
+      align-items: center;
     }
     .action-btn{
       background:rgba(108, 242, 194, 0.1);
@@ -230,6 +231,7 @@
       display: flex;
       align-items: center;
       gap: 5px;
+      white-space: nowrap;
     }
     .action-btn:hover{
       background:rgba(108, 242, 194, 0.2);
@@ -241,6 +243,33 @@
     }
     .clear-btn:hover {
       background: rgba(255, 100, 100, 0.2);
+    }
+    
+    /* Mode toggle button */
+    .mode-toggle {
+      background: rgba(255, 193, 7, 0.1);
+      border: 1px solid rgba(255, 193, 7, 0.3);
+      color: #ffc107;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      white-space: nowrap;
+    }
+    .mode-toggle:hover {
+      background: rgba(255, 193, 7, 0.2);
+    }
+    .mode-toggle.online-mode {
+      background: rgba(76, 175, 80, 0.1);
+      border: 1px solid rgba(76, 175, 80, 0.3);
+      color: #4CAF50;
+    }
+    .mode-toggle.online-mode:hover {
+      background: rgba(76, 175, 80, 0.2);
     }
     
     /* Chat area */
@@ -273,7 +302,7 @@
       align-self: flex-start;
     }
     
-    /* ===== 3. NEW: FORMATTED TEXT STYLES ===== */
+    /* ===== 3. FORMATTED TEXT STYLES ===== */
     .formatted-text {
       line-height: 1.6;
       font-size: 14px;
@@ -605,6 +634,27 @@
       color: var(--accent);
       margin-left: 10px;
     }
+    
+    /* Mode indicator */
+    .mode-status {
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 10px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin-left: 5px;
+    }
+    .mode-status.offline {
+      background: rgba(255, 193, 7, 0.1);
+      border: 1px solid rgba(255, 193, 7, 0.3);
+      color: #ffc107;
+    }
+    .mode-status.online-only {
+      background: rgba(76, 175, 80, 0.1);
+      border: 1px solid rgba(76, 175, 80, 0.3);
+      color: #4CAF50;
+    }
   </style>
 </head>
 <body>
@@ -721,7 +771,7 @@
         <p>Features include:</p>
         <ul>
           <li>Conversation memory for context-aware responses</li>
-          <li>Offline knowledge base for quick answers</li>
+          <li>Toggle between offline and online-only modes</li>
           <li>Online AI integration via Groq API</li>
           <li>Local browser storage for API keys</li>
           <li>Responsive design for all devices</li>
@@ -742,13 +792,26 @@
       <div class="header-actions">
         <button class="action-btn clear-btn" id="clearChatBtn">🗑️ Clear Chat</button>
         <button class="action-btn" id="openApiDialog">🔑 API Key</button>
+        <button class="mode-toggle" id="modeToggleBtn">
+          <span id="modeIcon">🌐</span>
+          <span id="modeText">Online-Only</span>
+        </button>
       </div>
     </header>
 
     <div id="chat" class="chat">
       <div class="msg ai">
         <div class="formatted-text">
-          <p>Hello! I'm Ramanujan School AI, created by students of Ramanujan Public School in Prayagraj.</p>
+          <p>Hello! I'm Ramanujan School AI, created by students of Ramanujan Public School in Prayagraj, Jhalwa. I'll remember our conversation as we chat.</p>
+          <p><strong>New Features:</strong></p>
+          <ul>
+            <li>Toggle between offline and online-only modes</li>
+            <li>Properly formatted responses with spacing and lists</li>
+            <li>Conversation memory for context-aware answers</li>
+            <li>Clean, modern interface with animations</li>
+          </ul>
+          <p><strong>Current Mode:</strong> <span id="currentModeDisplay">Online-Only Mode</span></p>
+          <p>In online-only mode, all questions go directly to the AI API for comprehensive answers.</p>
           <p>Ask me anything! 🙂</p>
         </div>
       </div>
@@ -760,7 +823,11 @@
         <button id="send">Send</button>
       </div>
       <div class="hint">
-        <span id="modeIndicator">🔴 Offline Mode</span>
+        <span>
+          <span id="modeIndicator">🔴 Offline Mode</span>
+          <span id="onlineModeStatus" class="mode-status online-only" style="display: none;">🌐 Online-Only</span>
+          <span id="offlineModeStatus" class="mode-status offline">📚 Offline Enabled</span>
+        </span>
         <span>
           <button class="credits-btn" id="openCreditsDialog">Credits</button>
         </span>
@@ -924,10 +991,11 @@
   }
 
   // Initialize memory system
-  const conversationMemory = new ConversationMemory(15);
+  const conversationMemory = new ConversationMemory(10);
   
   // Global variables
   let GROQ_API_KEY = localStorage.getItem('GROQ_API_KEY');
+  let OFFLINE_MODE_ENABLED = localStorage.getItem('OFFLINE_MODE_ENABLED') !== 'false'; // Default: true
   
   // DOM Elements
   const dialog = document.getElementById('apiDialog');
@@ -947,6 +1015,35 @@
   const q = document.getElementById('q');
   const send = document.getElementById('send');
   const clearChatBtn = document.getElementById('clearChatBtn');
+  const modeToggleBtn = document.getElementById('modeToggleBtn');
+  const modeIcon = document.getElementById('modeIcon');
+  const modeText = document.getElementById('modeText');
+  const currentModeDisplay = document.getElementById('currentModeDisplay');
+  const onlineModeStatus = document.getElementById('onlineModeStatus');
+  const offlineModeStatus = document.getElementById('offlineModeStatus');
+
+  // Initialize mode toggle
+  function updateModeUI() {
+    if (OFFLINE_MODE_ENABLED) {
+      modeToggleBtn.classList.remove('online-mode');
+      modeIcon.textContent = '🌐';
+      modeText.textContent = 'Online-Only';
+      currentModeDisplay.textContent = 'Hybrid Mode (Offline + Online)';
+      onlineModeStatus.style.display = 'none';
+      offlineModeStatus.style.display = 'inline-flex';
+      modeIndicator.textContent = '🟢 Hybrid Mode';
+      modeIndicator.style.color = '#6cf2c2';
+    } else {
+      modeToggleBtn.classList.add('online-mode');
+      modeIcon.textContent = '📚';
+      modeText.textContent = 'Offline Mode';
+      currentModeDisplay.textContent = 'Online-Only Mode';
+      onlineModeStatus.style.display = 'inline-flex';
+      offlineModeStatus.style.display = 'none';
+      modeIndicator.textContent = '🌐 Online-Only';
+      modeIndicator.style.color = '#7aa2ff';
+    }
+  }
 
   // Update API status
   function updateApiStatus() {
@@ -954,18 +1051,28 @@
       const maskedKey = `${GROQ_API_KEY.substring(0, 10)}...${GROQ_API_KEY.substring(GROQ_API_KEY.length - 4)}`;
       apiStatus.textContent = `✅ API Key saved: ${maskedKey}`;
       apiStatus.className = 'api-status valid';
-      modeIndicator.textContent = '🟢 Online Mode';
-      modeIndicator.style.color = '#6cf2c2';
     } else {
       apiStatus.textContent = '🔴 No API key saved (Offline mode only)';
       apiStatus.className = 'api-status invalid';
-      modeIndicator.textContent = '🔴 Offline Mode';
-      modeIndicator.style.color = '#ff7a7a';
     }
   }
 
   // Initialize UI
   updateApiStatus();
+  updateModeUI();
+
+  // Mode toggle button
+  modeToggleBtn.onclick = () => {
+    OFFLINE_MODE_ENABLED = !OFFLINE_MODE_ENABLED;
+    localStorage.setItem('OFFLINE_MODE_ENABLED', OFFLINE_MODE_ENABLED);
+    updateModeUI();
+    
+    const modeMessage = OFFLINE_MODE_ENABLED 
+      ? 'Switched to Hybrid Mode: I will use offline knowledge for simple queries and online AI for complex questions.' 
+      : 'Switched to Online-Only Mode: All queries will be sent to the AI API for comprehensive answers.';
+    
+    addMessageToChat(modeMessage, 'ai');
+  };
 
   // API Dialog functions
   openBtn.onclick = (e) => {
@@ -1000,8 +1107,17 @@
   // Clear chat button
   clearChatBtn.onclick = () => {
     if (confirm('Clear all chat messages and conversation memory?')) {
-      chat.innerHTML = '<div class="msg ai"><div class="formatted-text"><p>Hello! I\'m Ramanujan School AI, created by students of Ramanujan Public School in Prayagraj, Jhalwa. I\'ll remember our conversation as we chat.</p><p><strong>New Feature:</strong> My responses are now properly formatted with:</p><ul><li>Clear paragraph spacing</li><li>Numbered and bulleted lists</li><li>Proper headings and emphasis</li><li>Code formatting</li><li>Readable text structure</li></ul><p>Ask me anything! 🙂</p></div></div>';
+      chat.innerHTML = '<div class="msg ai"><div class="formatted-text"><p>Hello! I\'m Ramanujan School AI, created by students of Ramanujan Public School in Prayagraj, Jhalwa. I\'ll remember our conversation as we chat.</p><p><strong>New Features:</strong></p><ul><li>Toggle between offline and online-only modes</li><li>Properly formatted responses with spacing and lists</li><li>Conversation memory for context-aware answers</li><li>Clean, modern interface with animations</li></ul><p><strong>Current Mode:</strong> <span id="currentModeDisplay">' + (OFFLINE_MODE_ENABLED ? 'Hybrid Mode (Offline + Online)' : 'Online-Only Mode') + '</span></p><p>' + (OFFLINE_MODE_ENABLED ? 'In hybrid mode, simple queries use offline knowledge and complex ones use AI API.' : 'In online-only mode, all questions go directly to the AI API for comprehensive answers.') + '</p><p>Ask me anything! 🙂</p></div></div>';
       conversationMemory.clear();
+      // Update the currentModeDisplay in the new message
+      setTimeout(() => {
+        const newModeDisplay = document.getElementById('currentModeDisplay');
+        if (newModeDisplay) {
+          newModeDisplay.textContent = OFFLINE_MODE_ENABLED 
+            ? 'Hybrid Mode (Offline + Online)' 
+            : 'Online-Only Mode';
+        }
+      }, 100);
     }
   };
 
@@ -1027,7 +1143,7 @@
     GROQ_API_KEY = null;
     apiInput.value = '';
     updateApiStatus();
-    addMessageToChat('API key cleared. Switching to offline mode.', 'ai');
+    addMessageToChat('API key cleared. Switching to offline mode only.', 'ai');
   };
 
   testKey.onclick = async () => {
@@ -1070,7 +1186,7 @@
     if (e.key === 'Enter') saveKey.click(); 
   });
 
-  // Knowledge base - Updated with accurate school information
+  // Knowledge base
   const SCHOOL_KB = `Ramanujan Public School is a co-educational English-medium senior secondary school located in Jhalwa, Prayagraj (formerly Allahabad), Uttar Pradesh, India. It's affiliated with the Central Board of Secondary Education (CBSE) and offers classes from nursery up to class 12.
 
 🏫 About the School
@@ -1085,64 +1201,50 @@ Ramanujan Public School was established by the Brij Nath Dina Nath (BNDN) Memori
 This AI assistant was created by students of Class XI-B of Ramanujan Public School as an educational project.`;
 
   const JAGANNATH_KB = `Lord Jagannath is a revered form of Lord Vishnu/Krishna, worshipped primarily in Odisha, India.
-
 He is traditionally worshipped along with his siblings: Lord Balabhadra and Devi Subhadra.
-
-**Key Information:**
-1. **Temple**: Jagannath Puri Temple is one of the Char Dham pilgrimage sites of Hinduism
-2. **Location**: Located in Puri, Odisha
-3. **Unique Feature**: Wooden idols (daru brahma), ritually renewed in the Nabakalebara ceremony
-4. **Festival**: Annual Rath Yatra where deities are taken out on massive chariots
-5. **Symbolism**: Represents universality, compassion, and inclusiveness`;
+Jagannath Puri Temple is one of the Char Dham pilgrimage sites of Hinduism and is located in Puri, Odisha.
+A unique feature of Jagannath worship is the wooden idols (daru brahma), which are ritually renewed in the Nabakalebara ceremony.
+The annual Rath Yatra is a major festival where the deities are taken out on massive chariots for public darshan.
+Jagannath symbolizes universality, compassion, and inclusiveness.`;
 
   const MATH_KB = {
-    'pythagoras': '**Pythagorean Theorem**: a² + b² = c²\n\nWhere:\n- c is the hypotenuse of a right triangle\n- a and b are the other two sides',
-    'quadratic': '**Quadratic Formula**: x = [-b ± √(b² - 4ac)] / 2a\n\nUsed to solve equations of form: ax² + bx + c = 0',
-    'algebra': '**Algebra**: Branch of mathematics dealing with symbols and rules for manipulating those symbols.\n\n**Key Concepts**:\n- Variables and equations\n- Polynomials\n- Functions and graphs',
-    'geometry': '**Geometry**: Studies shapes, sizes, positions, and properties of space.\n\n**Main Areas**:\n1. Plane geometry (2D shapes)\n2. Solid geometry (3D shapes)\n3. Coordinate geometry',
-    'calculus': '**Calculus**: Mathematical study of continuous change.\n\n**Two Main Branches**:\n1. Differential calculus (rates of change)\n2. Integral calculus (accumulation of quantities)',
-    'trigonometry': '**Trigonometry**: Branch of mathematics dealing with relationships between angles and sides of triangles.\n\n**Key Functions**:\n- Sine (sin)\n- Cosine (cos)\n- Tangent (tan)\n- And their reciprocals',
-    'statistics': '**Statistics**: Science of collecting, analyzing, interpreting, and presenting data.\n\n**Key Concepts**:\n- Mean, median, mode\n- Standard deviation\n- Probability distributions',
-    'probability': '**Probability**: Branch of mathematics concerning numerical descriptions of how likely an event is to occur.\n\n**Basic Formula**: P(A) = Number of favorable outcomes / Total number of outcomes'
+    'pythagoras': 'The Pythagorean theorem states: a² + b² = c², where c is the hypotenuse of a right triangle.',
+    'quadratic': 'The quadratic formula: x = [-b ± √(b² - 4ac)] / 2a',
+    'algebra': 'Algebra is the branch of mathematics dealing with symbols and rules for manipulating those symbols.',
+    'geometry': 'Geometry studies shapes, sizes, positions, and properties of space.',
+    'calculus': 'Calculus is the mathematical study of continuous change.',
+    'trigonometry': 'Trigonometry deals with relationships between angles and sides of triangles.',
+    'statistics': 'Statistics is the study of data collection, analysis, interpretation, and presentation.',
+    'probability': 'Probability measures the likelihood of events occurring.'
   };
 
-  // Message handling functions
-  function isGreeting(t) { 
-    return /^(hi|hello|hey|namaste|good morning|good afternoon|good evening)/i.test(t); 
-  }
-  
-  function isHowAreYou(t) { 
-    return /(how are you|how r u|how're you)/i.test(t); 
-  }
-  
-  function isJagannathQuery(t) { 
-    return /(jagannath|puri|rath yatra|nabakalebara|mahaprasad|balabhadra|subhadra)/i.test(t); 
-  }
-  
-  function isSchoolQuery(t) {
-    return /(ramanujan|school|prayagraj|allahabad|jhalwa|cbse|bndn|gyan chandra|educational institution)/i.test(t);
-  }
-  
-  function isMathQuery(t) {
-    const lower = t.toLowerCase();
-    for (const key in MATH_KB) {
-      if (lower.includes(key)) return MATH_KB[key];
-    }
-    return null;
-  }
-
-  // Offline reply function
+  // Offline reply function (ONLY used when OFFLINE_MODE_ENABLED is true)
   function offlineReply(text) {
+    if (!OFFLINE_MODE_ENABLED) return null; // Skip offline mode if disabled
+    
     text = text.toLowerCase().trim();
-    if (isGreeting(text)) return 'Hello! How may I assist you with your studies today?';
-    if (isHowAreYou(text)) return 'I am functioning well. Ready to help with your questions!';
-    if (isSchoolQuery(text)) return SCHOOL_KB;
-    if (isJagannathQuery(text)) return JAGANNATH_KB;
-    const mathReply = isMathQuery(text); 
-    if (mathReply) return mathReply;
-    if (text.includes('api') || text.includes('key')) return 'You can manage your API key by clicking the "API Key" button in the top right.';
-    if (text.includes('credit') || text.includes('made by') || text.includes('who made') || text.includes('developed')) 
-      return 'I am Ramanujan School AI, created by students of Class XI-B at Ramanujan Public School, Prayagraj, Jhalwa. Click the "Credits" button below for more information.';
+    
+    // Only handle very basic greetings in offline mode
+    if (/^(hi|hello|hey|namaste)/i.test(text)) return 'Hello! How may I assist you with your studies today?';
+    if (/how are you/i.test(text)) return 'I am functioning well. Ready to help with your questions!';
+    
+    // For specific school queries that mention Ramanujan school by name
+    if (text.includes('ramanujan school') || text.includes('ramanujan public school') || 
+        text.includes('school in jhalwa') || text.includes('rps jhalwa')) {
+      return SCHOOL_KB;
+    }
+    
+    // For Jagannath queries
+    if (/jagannath|puri temple|rath yatra/i.test(text)) return JAGANNATH_KB;
+    
+    // For very specific math terms
+    const mathTerms = ['pythagoras', 'quadratic', 'algebra', 'geometry', 'calculus', 'trigonometry', 'statistics', 'probability'];
+    for (const term of mathTerms) {
+      if (text.includes(term) && text.split(' ').length < 5) { // Only for very short queries
+        return MATH_KB[term] || null;
+      }
+    }
+    
     return null;
   }
 
@@ -1185,25 +1287,27 @@ He is traditionally worshipped along with his siblings: Lord Balabhadra and Devi
 
     let typingIndicator = null;
     
-    // Check for offline reply first
-    const localReply = offlineReply(text);
-    if (localReply) {
-      typingIndicator = addMessageToChat('', 'ai', true);
-      
-      setTimeout(() => {
-        removeTypingIndicator();
-        addMessageToChat(localReply, 'ai');
-        conversationMemory.addMessage('assistant', localReply);
-        send.disabled = false;
-        q.disabled = false;
-        q.focus();
-      }, 500);
-      return;
+    // Check for offline reply first (only if offline mode is enabled)
+    if (OFFLINE_MODE_ENABLED) {
+      const localReply = offlineReply(text);
+      if (localReply) {
+        typingIndicator = addMessageToChat('', 'ai', true);
+        
+        setTimeout(() => {
+          removeTypingIndicator();
+          addMessageToChat(localReply, 'ai');
+          conversationMemory.addMessage('assistant', localReply);
+          send.disabled = false;
+          q.disabled = false;
+          q.focus();
+        }, 500);
+        return;
+      }
     }
 
-    // If no offline reply and no API key
+    // If no API key
     if (!GROQ_API_KEY) {
-      addMessageToChat('To answer this question, I need to use online features. Please add your Groq API key by clicking the "API Key" button in the top right.', 'ai');
+      addMessageToChat('To use online features, please add your Groq API key by clicking the "API Key" button in the top right.', 'ai');
       send.disabled = false;
       q.disabled = false;
       q.focus();
@@ -1220,7 +1324,13 @@ He is traditionally worshipped along with his siblings: Lord Balabhadra and Devi
       const messages = [
         {
           role: 'system',
-          content: 'You are Ramanujan School AI, a helpful assistant created by students of Ramanujan Public School in Prayagraj, Jhalwa. Ramanujan Public School is a REAL educational institution founded in 1995, located in Sahapur Urf Peepalgaon, Opposite IIIT, Jhalwa, Prayagraj. It is a CBSE-affiliated school managed by the Brij Nath Dina Nath (BNDN) Memorial Educational Society. Format your answers with proper paragraphs, lists, and spacing. Use markdown formatting for headings (**bold** for emphasis, *italics* for emphasis, ### for subheadings, and bullet points or numbered lists where appropriate). Make responses clear, educational, and well-structured. Never say the school is fictional or theoretical - it is a real school.'
+          content: `You are Ramanujan School AI, a helpful assistant created by students of Ramanujan Public School in Prayagraj, Jhalwa. 
+          
+          IMPORTANT: When users ask about "CBSE", "Central Board of Secondary Education", or general education topics, provide comprehensive information about CBSE as an educational board. DO NOT confuse it with information about Ramanujan Public School unless specifically asked about the school.
+          
+          Ramanujan Public School is affiliated with CBSE, but they are separate entities. Provide accurate information based on the query.
+          
+          Format your answers with proper paragraphs, lists, and spacing. Use markdown formatting for headings (**bold** for emphasis, *italics* for emphasis, ### for subheadings, and bullet points or numbered lists where appropriate). Make responses clear, educational, and well-structured.`
         },
         ...contextMessages.map(msg => ({
           role: msg.role === 'user' ? 'user' : 'assistant',
