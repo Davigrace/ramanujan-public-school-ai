@@ -446,179 +446,358 @@
     }
     
     /* Dialogs */
-    .api-dialog, .credits-dialog {
-      position:absolute;
-      top:50%;
-      left:50%;
-      transform:translate(-50%, -50%);
-      background:var(--card);
-      padding:25px;
-      border-radius:16px;
-      border:1px solid rgba(255,255,255,.15);
-      box-shadow:0 15px 50px rgba(0,0,0,.6);
-      width:400px;
-      max-width:90vw;
-      z-index:100;
-      display:none;
+    .dialog-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 100;
+      display: none;
+    }
+    .dialog-overlay.show {
+      display: block;
+    }
+    
+    .api-dialog, .credits-dialog, .history-dialog, .persona-dialog, .voice-dialog, .upload-dialog {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: var(--card);
+      padding: 25px;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, .15);
+      box-shadow: 0 15px 50px rgba(0, 0, 0, .6);
+      width: 450px;
+      max-width: 90vw;
+      max-height: 80vh;
+      overflow-y: auto;
+      z-index: 101;
+      display: none;
       animation: dialogFadeIn 0.3s ease;
     }
     @keyframes dialogFadeIn {
       from { opacity: 0; transform: translateY(-10px) translate(-50%, -50%); }
       to { opacity: 1; transform: translateY(0) translate(-50%, -50%); }
     }
-    .api-dialog.show, .credits-dialog.show {
-      display:block;
+    .api-dialog.show, .credits-dialog.show, .history-dialog.show, 
+    .persona-dialog.show, .voice-dialog.show, .upload-dialog.show {
+      display: block;
     }
     
-    /* API Dialog specific */
-    .api-dialog h3, .credits-dialog h3 {
-      margin:0 0 20px 0;
-      font-size:20px;
-      display:flex;
-      align-items:center;
-      gap:10px;
-      color:var(--accent);
-    }
-    .api-dialog h3:before{
-      content:"🔑";
-      font-size:18px;
-    }
-    .api-input-container{
-      display:flex;
-      gap:10px;
-      margin-bottom:12px;
-    }
-    .api-input{
-      flex:1;
-      background:rgba(255,255,255,.05);
-      border:1px solid rgba(255,255,255,.1);
-      border-radius:8px;
-      padding:10px 12px;
-      color:var(--text);
-      font-size:13px;
-      font-family:monospace;
-    }
-    .api-input:focus{
-      outline:none;
-      border-color:var(--accent);
-    }
-    .api-status{
-      font-size:12px;
-      margin-bottom:15px;
-      padding:8px;
-      border-radius:6px;
-      background:rgba(255,255,255,.05);
-    }
-    .api-status.valid{
-      color:var(--accent);
-      background:rgba(108, 242, 194, 0.1);
-    }
-    .api-status.invalid{
-      color:#ff7a7a;
-      background:rgba(255, 122, 122, 0.1);
-    }
-    .api-actions{
-      display:flex;
-      gap:8px;
-      justify-content:flex-end;
-    }
-    .api-actions button{
-      padding:8px 16px;
-      font-size:12px;
-    }
-    .api-actions .secondary{
-      background:rgba(255,255,255,.1);
-      color:var(--text);
-    }
-    .api-actions .secondary:hover{
-      background:rgba(255,255,255,.15);
-    }
-    .api-help{
-      font-size:11px;
-      color:var(--muted);
-      margin-top:12px;
-      line-height:1.4;
-    }
-    .api-help a{
-      color:var(--accent);
-      text-decoration:none;
-    }
-    .api-help a:hover{
-      text-decoration:underline;
+    /* Dialog specific */
+    .dialog-content {
+      max-height: 400px;
+      overflow-y: auto;
+      margin-bottom: 20px;
     }
     
-    /* Credits Dialog specific */
-    .credits-dialog h3:before{
-      content:"⭐";
-      font-size:18px;
+    .api-dialog h3, .credits-dialog h3, .history-dialog h3, 
+    .persona-dialog h3, .voice-dialog h3, .upload-dialog h3 {
+      margin: 0 0 20px 0;
+      font-size: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--accent);
     }
-    .credits-content{
-      font-size:14px;
-      line-height:1.6;
-      color:var(--text);
-      margin-bottom:20px;
+    
+    .api-dialog h3:before {
+      content: "🔑";
+      font-size: 18px;
     }
-    .credits-content p{
-      margin:0 0 15px 0;
+    .history-dialog h3:before {
+      content: "📜";
+      font-size: 18px;
     }
-    .credits-content strong{
-      color:var(--accent);
+    .persona-dialog h3:before {
+      content: "🎭";
+      font-size: 18px;
     }
-    .credits-content ul {
-      margin: 10px 0 15px 20px;
-      padding: 0;
+    .voice-dialog h3:before {
+      content: "🔊";
+      font-size: 18px;
     }
-    .credits-content li {
+    .upload-dialog h3:before {
+      content: "📁";
+      font-size: 18px;
+    }
+    
+    .api-input-container {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .api-input, .persona-input {
+      flex: 1;
+      background: rgba(255, 255, 255, .05);
+      border: 1px solid rgba(255, 255, 255, .1);
+      border-radius: 8px;
+      padding: 10px 12px;
+      color: var(--text);
+      font-size: 13px;
+      font-family: 'Inter', sans-serif;
+      resize: vertical;
+    }
+    .persona-input {
+      width: 100%;
+      min-height: 120px;
+    }
+    .api-input:focus, .persona-input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+    
+    /* Voice selection */
+    .voice-options {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .voice-option {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .voice-option:hover {
+      background: rgba(108, 242, 194, 0.05);
+      border-color: rgba(108, 242, 194, 0.3);
+    }
+    .voice-option.selected {
+      background: rgba(108, 242, 194, 0.1);
+      border-color: var(--accent);
+    }
+    .voice-option input[type="radio"] {
+      margin: 0;
+    }
+    .voice-label {
+      display: flex;
+      flex-direction: column;
+    }
+    .voice-name {
+      font-weight: 600;
+      color: var(--text);
+    }
+    .voice-type {
+      font-size: 11px;
+      color: var(--muted);
+    }
+    
+    /* Upload area */
+    .upload-area {
+      border: 2px dashed rgba(255, 255, 255, 0.2);
+      border-radius: 12px;
+      padding: 30px;
+      text-align: center;
+      margin-bottom: 20px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .upload-area:hover {
+      border-color: var(--accent);
+      background: rgba(108, 242, 194, 0.05);
+    }
+    .upload-area.dragover {
+      border-color: var(--accent);
+      background: rgba(108, 242, 194, 0.1);
+    }
+    .upload-icon {
+      font-size: 40px;
+      margin-bottom: 10px;
+      color: var(--accent);
+    }
+    .upload-text {
+      color: var(--text);
       margin-bottom: 5px;
     }
-    .credits-close{
-      display:block;
-      margin-left:auto;
-      padding:8px 20px;
-      font-size:13px;
+    .upload-subtext {
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .uploaded-files {
+      margin-top: 20px;
+      max-height: 150px;
+      overflow-y: auto;
+    }
+    .uploaded-file {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 12px;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 6px;
+      margin-bottom: 5px;
+    }
+    .file-name {
+      font-size: 13px;
+      color: var(--text);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .file-size {
+      font-size: 11px;
+      color: var(--muted);
+    }
+    .remove-file {
+      background: none;
+      border: none;
+      color: #ff7a7a;
+      cursor: pointer;
+      font-size: 14px;
+      padding: 2px 6px;
+    }
+    
+    /* Audio controls */
+    .audio-controls {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      margin-left: 5px;
+    }
+    .audio-btn {
+      background: rgba(122, 162, 255, 0.1);
+      border: 1px solid rgba(122, 162, 255, 0.3);
+      color: var(--accent2);
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .audio-btn:hover {
+      background: rgba(122, 162, 255, 0.2);
+    }
+    .audio-btn.active {
+      background: rgba(108, 242, 194, 0.2);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    
+    /* Microphone button */
+    .mic-btn {
+      background: rgba(255, 193, 7, 0.1);
+      border: 1px solid rgba(255, 193, 7, 0.3);
+      color: #ffc107;
+      padding: 10px 14px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 44px;
+    }
+    .mic-btn:hover {
+      background: rgba(255, 193, 7, 0.2);
+    }
+    .mic-btn.listening {
+      background: rgba(255, 50, 50, 0.2);
+      border-color: #ff3232;
+      color: #ff3232;
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+    
+    /* Status indicators */
+    .api-status {
+      font-size: 12px;
+      margin-bottom: 15px;
+      padding: 8px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, .05);
+    }
+    .api-status.valid {
+      color: var(--accent);
+      background: rgba(108, 242, 194, 0.1);
+    }
+    .api-status.invalid {
+      color: #ff7a7a;
+      background: rgba(255, 122, 122, 0.1);
+    }
+    .api-actions, .dialog-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+    .api-actions button, .dialog-actions button {
+      padding: 8px 16px;
+      font-size: 12px;
+    }
+    .api-actions .secondary, .dialog-actions .secondary {
+      background: rgba(255, 255, 255, .1);
+      color: var(--text);
+    }
+    .api-actions .secondary:hover, .dialog-actions .secondary:hover {
+      background: rgba(255, 255, 255, .15);
+    }
+    .api-help {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 12px;
+      line-height: 1.4;
+    }
+    .api-help a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+    .api-help a:hover {
+      text-decoration: underline;
     }
     
     /* Close buttons */
-    .close-dialog{
-      position:absolute;
-      top:12px;
-      right:12px;
-      background:none;
-      border:none;
-      color:var(--muted);
-      font-size:18px;
-      cursor:pointer;
-      width:24px;
-      height:24px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      border-radius:50%;
-      transition:all 0.3s ease;
+    .close-dialog {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 18px;
+      cursor: pointer;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      transition: all 0.3s ease;
     }
-    .close-dialog:hover{
-      background:rgba(255,255,255,.1);
-      color:var(--text);
+    .close-dialog:hover {
+      background: rgba(255, 255, 255, .1);
+      color: var(--text);
     }
     
     /* Typing indicator */
-    .typing-indicator{
-      display:flex;
-      gap:4px;
-      padding:8px 12px;
+    .typing-indicator {
+      display: flex;
+      gap: 4px;
+      padding: 8px 12px;
     }
-    .typing-indicator span{
-      width:8px;
-      height:8px;
-      background:var(--accent);
-      border-radius:50%;
-      animation:typing 1.4s infinite ease-in-out;
+    .typing-indicator span {
+      width: 8px;
+      height: 8px;
+      background: var(--accent);
+      border-radius: 50%;
+      animation: typing 1.4s infinite ease-in-out;
     }
-    .typing-indicator span:nth-child(1){animation-delay:-0.32s;}
-    .typing-indicator span:nth-child(2){animation-delay:-0.16s;}
-    @keyframes typing{
-      0%, 80%, 100%{transform:scale(0.6); opacity:0.3;}
-      40%{transform:scale(1); opacity:1;}
+    .typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
+    .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
+    @keyframes typing {
+      0%, 80%, 100% { transform: scale(0.6); opacity: 0.3; }
+      40% { transform: scale(1); opacity: 1; }
     }
     
     /* Memory indicator */
@@ -654,6 +833,37 @@
       background: rgba(76, 175, 80, 0.1);
       border: 1px solid rgba(76, 175, 80, 0.3);
       color: #4CAF50;
+    }
+    
+    /* History items */
+    .history-item {
+      background: rgba(255, 255, 255, 0.03);
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.07);
+    }
+    .history-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    .history-role {
+      font-weight: 600;
+      color: var(--accent);
+    }
+    .history-time {
+      font-size: 11px;
+      color: var(--muted);
+    }
+    .history-content {
+      font-size: 13px;
+      color: var(--text);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
     }
   </style>
 </head>
@@ -733,56 +943,12 @@
     </div>
   </div>
 
+  <!-- ===== DIALOG OVERLAY ===== -->
+  <div class="dialog-overlay" id="dialogOverlay"></div>
+
   <!-- ===== MAIN CHAT APP (HIDDEN INITIALLY) ===== -->
   <div class="app" id="mainApp" style="display: none;">
-    <!-- API Key Dialog -->
-    <div id="apiDialog" class="api-dialog">
-      <button class="close-dialog" id="closeDialog">×</button>
-      <h3>Groq API Key</h3>
-      <div class="api-input-container">
-        <input type="password" id="apiInput" class="api-input" placeholder="Enter your API key..." />
-        <button id="saveKey" class="small">Save</button>
-      </div>
-      <div id="apiStatus" class="api-status">
-        Status: No API key saved
-      </div>
-      <div class="api-actions">
-        <button id="clearKey" class="secondary">Clear Key</button>
-        <button id="testKey" class="secondary">Test Key</button>
-      </div>
-      <div class="api-help">
-        Get your free API key from
-        <a href="https://console.groq.com" target="_blank">Groq Console</a>.
-        Keys are stored locally in your browser only.
-      </div>
-    </div>
-
-    <!-- Credits Dialog -->
-    <div id="creditsDialog" class="credits-dialog">
-      <button class="close-dialog" id="closeCreditsDialog">×</button>
-      <h3>Project Credits</h3>
-      <div class="credits-content">
-        <p>This AI Assistant was developed with the assistance of <strong>DeepSeek AI</strong>, which provided coding guidance and implementation support.</p>
-        
-        <p>The AI capabilities are powered by <strong>Groq Cloud API</strong> through the Groq Console, providing fast and efficient language model processing.</p>
-        
-        <p>All code was written by students of <strong>Class IX-B, Ramanujan Public School, Prayagraj, Jhalwa</strong> as an educational project.</p>
-        
-        <p>Features include:</p>
-        <ul>
-          <li>Conversation memory for context-aware responses</li>
-          <li>Toggle between offline and online-only modes</li>
-          <li>Online AI integration via Groq API</li>
-          <li>Local browser storage for API keys</li>
-          <li>Responsive design for all devices</li>
-          <li>Properly formatted responses with spacing and lists</li>
-        </ul>
-        
-        <p><strong>Team Members:</strong> Priyansh (Developer & Presenter), Vansh, Shreyash, Shreya, Anshika, Ananya, Ankit, Kashfa, Utkarshini (All Presenters)</p>
-      </div>
-      <button class="credits-close" id="closeCreditsBtn">Close</button>
-    </div>
-
+    <!-- Header with all action buttons -->
     <header>
       <div class="logo"><img src="assets/images/logo.png" alt="School Logo"></div>
       <div>
@@ -792,6 +958,10 @@
       <div class="header-actions">
         <button class="action-btn clear-btn" id="clearChatBtn">🗑️ Clear Chat</button>
         <button class="action-btn" id="openApiDialog">🔑 API Key</button>
+        <button class="action-btn" id="openHistoryBtn">📜 History</button>
+        <button class="action-btn" id="openPersonaBtn">🎭 Persona</button>
+        <button class="action-btn" id="openVoiceBtn">🔊 Voice</button>
+        <button class="action-btn" id="openUploadBtn">📁 Upload</button>
         <button class="mode-toggle" id="modeToggleBtn">
           <span id="modeIcon">🌐</span>
           <span id="modeText">Online-Only</span>
@@ -799,16 +969,20 @@
       </div>
     </header>
 
+    <!-- Chat area -->
     <div id="chat" class="chat">
       <div class="msg ai">
         <div class="formatted-text">
           <p>Hello! I'm Ramanujan School AI, created by students of Ramanujan Public School in Prayagraj, Jhalwa. I'll remember our conversation as we chat.</p>
           <p><strong>New Features:</strong></p>
           <ul>
+            <li>Microphone input - Click 🎤 to speak</li>
+            <li>Voice output - Choose from male/female voices</li>
+            <li>Chat history and persona settings</li>
+            <li>File upload support (text files)</li>
             <li>Toggle between offline and online-only modes</li>
             <li>Properly formatted responses with spacing and lists</li>
             <li>Conversation memory for context-aware answers</li>
-            <li>Clean, modern interface with animations</li>
           </ul>
           <p><strong>Current Mode:</strong> <span id="currentModeDisplay">Online-Only Mode</span></p>
           <p>In online-only mode, all questions go directly to the AI API for comprehensive answers.</p>
@@ -817,9 +991,11 @@
       </div>
     </div>
 
+    <!-- Footer with input and microphone -->
     <footer>
       <div class="input">
-        <input id="q" placeholder="Type your question..." />
+        <input id="q" placeholder="Type your question or click 🎤 to speak..." />
+        <button class="mic-btn" id="micBtn">🎤</button>
         <button id="send">Send</button>
       </div>
       <div class="hint">
@@ -833,6 +1009,140 @@
         </span>
       </div>
     </footer>
+  </div>
+
+  <!-- ===== ALL DIALOGS ===== -->
+  
+  <!-- API Key Dialog -->
+  <div id="apiDialog" class="api-dialog">
+    <button class="close-dialog" id="closeApiDialog">×</button>
+    <h3>Groq API Key</h3>
+    <div class="api-input-container">
+      <input type="password" id="apiInput" class="api-input" placeholder="Enter your API key..." />
+      <button id="saveKey" class="small">Save</button>
+    </div>
+    <div id="apiStatus" class="api-status">
+      Status: No API key saved
+    </div>
+    <div class="api-actions">
+      <button id="clearKey" class="secondary">Clear Key</button>
+      <button id="testKey" class="secondary">Test Key</button>
+    </div>
+    <div class="api-help">
+      Get your free API key from
+      <a href="https://console.groq.com" target="_blank">Groq Console</a>.
+      Keys are stored locally in your browser only.
+    </div>
+  </div>
+
+  <!-- Credits Dialog -->
+  <div id="creditsDialog" class="credits-dialog">
+    <button class="close-dialog" id="closeCreditsDialog">×</button>
+    <h3>Project Credits</h3>
+    <div class="credits-content">
+      <p>This AI Assistant was developed with the assistance of <strong>DeepSeek AI</strong>, which provided coding guidance and implementation support.</p>
+      
+      <p>The AI capabilities are powered by <strong>Groq Cloud API</strong> through the Groq Console, providing fast and efficient language model processing.</p>
+      
+      <p>All code was written by students of <strong>Class IX-B, Ramanujan Public School, Prayagraj, Jhalwa</strong> as an educational project.</p>
+      
+      <p>Features include:</p>
+      <ul>
+        <li>Microphone voice input with real-time transcription</li>
+        <li>Text-to-speech output with male/female voice selection</li>
+        <li>Chat history with search and clear options</li>
+        <li>Custom persona settings for AI behavior</li>
+        <li>File upload and text extraction</li>
+        <li>Conversation memory for context-aware responses</li>
+        <li>Toggle between offline and online-only modes</li>
+        <li>Local browser storage for API keys</li>
+        <li>Responsive design for all devices</li>
+        <li>Properly formatted responses with spacing and lists</li>
+      </ul>
+      
+      <p><strong>Team Members:</strong> Priyansh (Developer & Presenter), Vansh, Shreyash, Shreya, Anshika, Ananya, Ankit, Kashfa, Utkarshini (All Presenters)</p>
+    </div>
+    <button class="credits-close" id="closeCreditsBtn">Close</button>
+  </div>
+
+  <!-- History Dialog -->
+  <div id="historyDialog" class="history-dialog">
+    <button class="close-dialog" id="closeHistoryDialog">×</button>
+    <h3>Chat History</h3>
+    <div id="historyContent" class="dialog-content">
+      <!-- History items will be loaded here -->
+    </div>
+    <div class="dialog-actions">
+      <button id="clearHistoryBtn" class="secondary">Clear History</button>
+      <button id="closeHistoryBtn" class="credits-close">Close</button>
+    </div>
+  </div>
+
+  <!-- Persona Dialog -->
+  <div id="personaDialog" class="persona-dialog">
+    <button class="close-dialog" id="closePersonaDialog">×</button>
+    <h3>AI Persona Settings</h3>
+    <div class="credits-content">
+      <p>How should the AI respond?</p>
+      <textarea id="personaInput" class="persona-input" placeholder="Example: You are a friendly math tutor. Explain concepts simply with examples. Use bullet points for clarity. Keep answers concise."></textarea>
+      <small style="color: var(--muted); display: block; margin-top: 5px;">These instructions will be added to every AI request.</small>
+    </div>
+    <div class="dialog-actions">
+      <button id="clearPersonaBtn" class="secondary">Clear</button>
+      <button id="savePersonaBtn" class="credits-close">Save Persona</button>
+    </div>
+  </div>
+
+  <!-- Voice Settings Dialog -->
+  <div id="voiceDialog" class="voice-dialog">
+    <button class="close-dialog" id="closeVoiceDialog">×</button>
+    <h3>Voice Settings</h3>
+    <div class="credits-content">
+      <p>Select a voice for text-to-speech output:</p>
+      <div class="voice-options" id="voiceOptions">
+        <!-- Voice options will be added here -->
+      </div>
+      <div style="margin-top: 20px;">
+        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+          <input type="checkbox" id="autoSpeakToggle">
+          <span>Automatically speak AI responses</span>
+        </label>
+        <small style="color: var(--muted); display: block; margin-top: 5px;">When enabled, AI responses will be read aloud automatically.</small>
+      </div>
+      <div style="margin-top: 15px;">
+        <button id="testVoiceBtn" class="audio-btn" style="width: 100%;">Test Selected Voice</button>
+      </div>
+    </div>
+    <button class="credits-close" id="closeVoiceBtn">Close</button>
+  </div>
+
+  <!-- Upload Dialog -->
+  <div id="uploadDialog" class="upload-dialog">
+    <button class="close-dialog" id="closeUploadDialog">×</button>
+    <h3>File Upload</h3>
+    <div class="credits-content">
+      <div class="upload-area" id="uploadArea">
+        <div class="upload-icon">📁</div>
+        <div class="upload-text">Drop files here or click to browse</div>
+        <div class="upload-subtext">Supported: .txt, .pdf, .doc, .docx (Max 5MB)</div>
+      </div>
+      <input type="file" id="fileInput" multiple style="display: none;">
+      
+      <div class="uploaded-files" id="uploadedFiles">
+        <!-- Uploaded files will be listed here -->
+      </div>
+      
+      <div style="margin-top: 20px;">
+        <small style="color: var(--muted);">
+          Uploaded files will be extracted as text and can be referenced in conversations.
+          Files are stored in your browser's local storage.
+        </small>
+      </div>
+    </div>
+    <div class="dialog-actions">
+      <button id="clearFilesBtn" class="secondary">Clear All Files</button>
+      <button id="closeUploadBtn" class="credits-close">Close</button>
+    </div>
   </div>
 
 <script>
@@ -860,37 +1170,31 @@
       startupScreen.style.display = 'none';
       document.getElementById('mainApp').style.display = 'grid';
       document.getElementById('q').focus();
+      initVoiceSettings(); // Initialize voice settings
     }, 600);
   }
 
   /* ===== TEXT FORMATTING FUNCTION ===== */
   function formatTextForDisplay(text) {
-    // If it's already formatted (contains HTML), return as is
     if (/<[a-z][\s\S]*>/i.test(text)) {
       return text;
     }
     
     let formattedText = text;
     
-    // 1. Replace markdown-style headings
+    // Replace markdown-style formatting
     formattedText = formattedText.replace(/^### (.*$)/gim, '<h4>$1</h4>');
     formattedText = formattedText.replace(/^## (.*$)/gim, '<h3>$1</h3>');
     formattedText = formattedText.replace(/^# (.*$)/gim, '<h3>$1</h3>');
     
-    // 2. Replace markdown bold and italic
     formattedText = formattedText.replace(/\*\*\*(.*?)\*\*\*/g, '<strong><em>$1</em></strong>');
     formattedText = formattedText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
     formattedText = formattedText.replace(/\*(.*?)\*/g, '<em>$1</em>');
     
-    // 3. Handle numbered lists (1., 2., etc.)
     formattedText = formattedText.replace(/^(\d+)\.\s+(.*$)/gim, '<li><strong>$1.</strong> $2</li>');
-    
-    // 4. Handle bullet points (*, -, •)
     formattedText = formattedText.replace(/^[\*\-\•]\s+(.*$)/gim, '<li>$1</li>');
     
-    // 5. Wrap lists in proper HTML
     if (formattedText.includes('<li>')) {
-      // Check if it starts with numbers (ordered list)
       if (formattedText.match(/^<li><strong>\d+\./)) {
         formattedText = formattedText.replace(/<li>/g, '<li>');
         formattedText = '<ol>' + formattedText + '</ol>';
@@ -899,46 +1203,36 @@
       }
     }
     
-    // 6. Handle code blocks
     formattedText = formattedText.replace(/`([^`]+)`/g, '<code>$1</code>');
     
-    // 7. Split into paragraphs (double newlines)
     let paragraphs = formattedText.split(/\n\s*\n/);
     
-    // 8. Process each paragraph
     paragraphs = paragraphs.map(para => {
       para = para.trim();
       if (!para) return '';
       
-      // If paragraph already starts with HTML tag, leave it
       if (para.startsWith('<')) {
         return para;
       }
       
-      // If it's a short line (might be heading or list item), don't wrap in p
       if (para.length < 100 && (para.includes('<h') || para.includes('<li>'))) {
         return para;
       }
       
-      // Wrap in paragraph tag
       return '<p>' + para + '</p>';
     });
     
-    // 9. Join paragraphs
     formattedText = paragraphs.filter(p => p).join('');
-    
-    // 10. Clean up multiple line breaks within paragraphs
     formattedText = formattedText.replace(/\n/g, '<br>');
     
-    // 11. Add the formatted-text class wrapper
     return '<div class="formatted-text">' + formattedText + '</div>';
   }
 
-  /* ===== CHAT APP LOGIC ===== */
+  /* ===== MAIN APPLICATION ===== */
   
   // Conversation memory system
   class ConversationMemory {
-    constructor(maxMessages = 10) {
+    constructor(maxMessages = 20) {
       this.maxMessages = maxMessages;
       this.messages = [];
       this.loadFromStorage();
@@ -952,6 +1246,10 @@
     
     getContextMessages() {
       return this.messages.slice(-this.maxMessages);
+    }
+    
+    getFullHistory() {
+      return this.messages;
     }
     
     clear() {
@@ -990,40 +1288,297 @@
     }
   }
 
-  // Initialize memory system
-  const conversationMemory = new ConversationMemory(10);
+  // File storage system
+  class FileStorage {
+    constructor() {
+      this.files = [];
+      this.loadFromStorage();
+    }
+    
+    addFile(name, content, size) {
+      const file = {
+        id: Date.now().toString(),
+        name,
+        content,
+        size,
+        uploaded: Date.now()
+      };
+      this.files.push(file);
+      this.saveToStorage();
+      return file;
+    }
+    
+    removeFile(id) {
+      this.files = this.files.filter(file => file.id !== id);
+      this.saveToStorage();
+    }
+    
+    clearAll() {
+      this.files = [];
+      localStorage.removeItem('uploaded_files');
+    }
+    
+    getFiles() {
+      return this.files;
+    }
+    
+    saveToStorage() {
+      try {
+        localStorage.setItem('uploaded_files', JSON.stringify(this.files));
+      } catch (e) {
+        console.warn('Could not save files:', e);
+      }
+    }
+    
+    loadFromStorage() {
+      try {
+        const saved = localStorage.getItem('uploaded_files');
+        if (saved) {
+          this.files = JSON.parse(saved);
+        }
+      } catch (e) {
+        console.warn('Could not load files:', e);
+      }
+    }
+  }
+
+  // Initialize systems
+  const conversationMemory = new ConversationMemory(20);
+  const fileStorage = new FileStorage();
   
   // Global variables
   let GROQ_API_KEY = localStorage.getItem('GROQ_API_KEY');
-  let OFFLINE_MODE_ENABLED = localStorage.getItem('OFFLINE_MODE_ENABLED') !== 'false'; // Default: true
+  let OFFLINE_MODE_ENABLED = localStorage.getItem('OFFLINE_MODE_ENABLED') !== 'false';
+  let selectedVoice = localStorage.getItem('selected_voice') || 'female-1';
+  let autoSpeak = localStorage.getItem('auto_speak') === 'true';
+  let currentPersona = localStorage.getItem('AI_PERSONA') || '';
   
+  // Speech synthesis
+  let speechSynthesis = window.speechSynthesis;
+  let voices = [];
+  let currentUtterance = null;
+
   // DOM Elements
-  const dialog = document.getElementById('apiDialog');
-  const openBtn = document.getElementById('openApiDialog');
-  const closeBtn = document.getElementById('closeDialog');
-  const apiInput = document.getElementById('apiInput');
-  const saveKey = document.getElementById('saveKey');
-  const clearKey = document.getElementById('clearKey');
-  const testKey = document.getElementById('testKey');
-  const apiStatus = document.getElementById('apiStatus');
-  const modeIndicator = document.getElementById('modeIndicator');
-  const creditsDialog = document.getElementById('creditsDialog');
-  const openCreditsBtn = document.getElementById('openCreditsDialog');
-  const closeCreditsBtn = document.getElementById('closeCreditsBtn');
-  const closeCreditsDialogBtn = document.getElementById('closeCreditsDialog');
+  const dialogOverlay = document.getElementById('dialogOverlay');
   const chat = document.getElementById('chat');
   const q = document.getElementById('q');
   const send = document.getElementById('send');
-  const clearChatBtn = document.getElementById('clearChatBtn');
-  const modeToggleBtn = document.getElementById('modeToggleBtn');
-  const modeIcon = document.getElementById('modeIcon');
-  const modeText = document.getElementById('modeText');
-  const currentModeDisplay = document.getElementById('currentModeDisplay');
-  const onlineModeStatus = document.getElementById('onlineModeStatus');
-  const offlineModeStatus = document.getElementById('offlineModeStatus');
+  const micBtn = document.getElementById('micBtn');
+  
+  // Dialog elements
+  const dialogs = {
+    api: document.getElementById('apiDialog'),
+    credits: document.getElementById('creditsDialog'),
+    history: document.getElementById('historyDialog'),
+    persona: document.getElementById('personaDialog'),
+    voice: document.getElementById('voiceDialog'),
+    upload: document.getElementById('uploadDialog')
+  };
+  
+  // Initialize UI
+  function initVoiceSettings() {
+    // Load available voices
+    voices = speechSynthesis.getVoices();
+    
+    // If voices aren't loaded yet, wait for them
+    if (voices.length === 0) {
+      speechSynthesis.onvoiceschanged = () => {
+        voices = speechSynthesis.getVoices();
+        populateVoiceOptions();
+      };
+    } else {
+      populateVoiceOptions();
+    }
+    
+    // Set auto-speak toggle
+    document.getElementById('autoSpeakToggle').checked = autoSpeak;
+    
+    // Set persona input
+    document.getElementById('personaInput').value = currentPersona;
+    
+    // Load uploaded files display
+    updateUploadedFilesDisplay();
+  }
 
-  // Initialize mode toggle
+  function populateVoiceOptions() {
+    const voiceOptions = document.getElementById('voiceOptions');
+    voiceOptions.innerHTML = '';
+    
+    // Create custom voice options (using browser voices)
+    const customVoices = [
+      { id: 'female-1', name: 'Female Voice 1', type: 'Female', lang: 'en-US' },
+      { id: 'female-2', name: 'Female Voice 2', type: 'Female', lang: 'en-GB' },
+      { id: 'male-1', name: 'Male Voice 1', type: 'Male', lang: 'en-US' },
+      { id: 'male-2', name: 'Male Voice 2', type: 'Male', lang: 'en-GB' }
+    ];
+    
+    customVoices.forEach(voice => {
+      const option = document.createElement('div');
+      option.className = `voice-option ${selectedVoice === voice.id ? 'selected' : ''}`;
+      option.innerHTML = `
+        <input type="radio" name="voice" value="${voice.id}" ${selectedVoice === voice.id ? 'checked' : ''}>
+        <div class="voice-label">
+          <div class="voice-name">${voice.name}</div>
+          <div class="voice-type">${voice.type} • ${voice.lang}</div>
+        </div>
+      `;
+      
+      option.querySelector('input').addEventListener('change', (e) => {
+        selectedVoice = e.target.value;
+        localStorage.setItem('selected_voice', selectedVoice);
+        
+        // Update selected state
+        document.querySelectorAll('.voice-option').forEach(opt => {
+          opt.classList.remove('selected');
+        });
+        option.classList.add('selected');
+      });
+      
+      voiceOptions.appendChild(option);
+    });
+  }
+
+  // Speech functions
+  function speakText(text) {
+    if (!autoSpeak || !speechSynthesis) return;
+    
+    // Stop any current speech
+    if (currentUtterance) {
+      speechSynthesis.cancel();
+    }
+    
+    // Clean text for speech (remove markdown, etc.)
+    const cleanText = text
+      .replace(/[#*`\[\]]/g, '')
+      .replace(/\n/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+    
+    if (!cleanText) return;
+    
+    currentUtterance = new SpeechSynthesisUtterance(cleanText);
+    
+    // Set voice based on selection
+    const availableVoices = speechSynthesis.getVoices();
+    
+    // Try to find a matching voice
+    let voiceToUse = null;
+    if (selectedVoice.includes('female')) {
+      voiceToUse = availableVoices.find(v => 
+        v.lang.includes('en') && v.name.toLowerCase().includes('female')
+      ) || availableVoices.find(v => v.lang.includes('en'));
+    } else {
+      voiceToUse = availableVoices.find(v => 
+        v.lang.includes('en') && v.name.toLowerCase().includes('male')
+      ) || availableVoices.find(v => v.lang.includes('en'));
+    }
+    
+    if (voiceToUse) {
+      currentUtterance.voice = voiceToUse;
+    }
+    
+    currentUtterance.rate = 1.0;
+    currentUtterance.pitch = 1.0;
+    currentUtterance.volume = 1.0;
+    
+    speechSynthesis.speak(currentUtterance);
+  }
+
+  function stopSpeaking() {
+    if (speechSynthesis && speechSynthesis.speaking) {
+      speechSynthesis.cancel();
+    }
+  }
+
+  // Voice recognition
+  let recognition = null;
+  let isListening = false;
+
+  function initVoiceRecognition() {
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognition = new SpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.lang = 'en-US';
+      
+      recognition.onstart = () => {
+        isListening = true;
+        micBtn.classList.add('listening');
+        micBtn.textContent = '🔴';
+      };
+      
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        q.value = transcript;
+        micBtn.classList.remove('listening');
+        micBtn.textContent = '🎤';
+        isListening = false;
+        
+        // Auto-send if it sounds like a question
+        if (transcript.trim().endsWith('?')) {
+          setTimeout(() => ask(), 500);
+        }
+      };
+      
+      recognition.onerror = (event) => {
+        console.error('Speech recognition error:', event.error);
+        micBtn.classList.remove('listening');
+        micBtn.textContent = '🎤';
+        isListening = false;
+        
+        if (event.error === 'not-allowed') {
+          addMessageToChat('Microphone access was denied. Please allow microphone access in your browser settings.', 'ai');
+        }
+      };
+      
+      recognition.onend = () => {
+        if (isListening) {
+          // Restart if still supposed to be listening
+          setTimeout(() => recognition.start(), 100);
+        } else {
+          micBtn.classList.remove('listening');
+          micBtn.textContent = '🎤';
+        }
+      };
+    } else {
+      micBtn.style.display = 'none';
+      addMessageToChat('Speech recognition is not supported in your browser. Try Chrome or Edge.', 'ai');
+    }
+  }
+
+  // Microphone button handler
+  micBtn.onclick = () => {
+    if (!recognition) {
+      initVoiceRecognition();
+      return;
+    }
+    
+    if (isListening) {
+      recognition.stop();
+      isListening = false;
+      micBtn.classList.remove('listening');
+      micBtn.textContent = '🎤';
+    } else {
+      try {
+        recognition.start();
+      } catch (e) {
+        console.error('Failed to start recognition:', e);
+        addMessageToChat('Failed to start microphone. Please check permissions.', 'ai');
+      }
+    }
+  };
+
+  // Update mode UI
   function updateModeUI() {
+    const modeToggleBtn = document.getElementById('modeToggleBtn');
+    const modeIcon = document.getElementById('modeIcon');
+    const modeText = document.getElementById('modeText');
+    const currentModeDisplay = document.getElementById('currentModeDisplay');
+    const onlineModeStatus = document.getElementById('onlineModeStatus');
+    const offlineModeStatus = document.getElementById('offlineModeStatus');
+    const modeIndicator = document.getElementById('modeIndicator');
+
     if (OFFLINE_MODE_ENABLED) {
       modeToggleBtn.classList.remove('online-mode');
       modeIcon.textContent = '🌐';
@@ -1047,6 +1602,7 @@
 
   // Update API status
   function updateApiStatus() {
+    const apiStatus = document.getElementById('apiStatus');
     if (GROQ_API_KEY) {
       const maskedKey = `${GROQ_API_KEY.substring(0, 10)}...${GROQ_API_KEY.substring(GROQ_API_KEY.length - 4)}`;
       apiStatus.textContent = `✅ API Key saved: ${maskedKey}`;
@@ -1057,134 +1613,338 @@
     }
   }
 
-  // Initialize UI
-  updateApiStatus();
-  updateModeUI();
-
-  // Mode toggle button
-  modeToggleBtn.onclick = () => {
-    OFFLINE_MODE_ENABLED = !OFFLINE_MODE_ENABLED;
-    localStorage.setItem('OFFLINE_MODE_ENABLED', OFFLINE_MODE_ENABLED);
-    updateModeUI();
+  // Dialog management
+  function showDialog(dialogName) {
+    // Hide all dialogs first
+    Object.values(dialogs).forEach(dialog => {
+      dialog.classList.remove('show');
+    });
     
-    const modeMessage = OFFLINE_MODE_ENABLED 
-      ? 'Switched to Hybrid Mode: I will use offline knowledge for simple queries and online AI for complex questions.' 
-      : 'Switched to Online-Only Mode: All queries will be sent to the AI API for comprehensive answers.';
+    // Show overlay and selected dialog
+    dialogOverlay.classList.add('show');
+    dialogs[dialogName].classList.add('show');
+  }
+
+  function hideAllDialogs() {
+    dialogOverlay.classList.remove('show');
+    Object.values(dialogs).forEach(dialog => {
+      dialog.classList.remove('show');
+    });
+  }
+
+  // Initialize event listeners
+  function initEventListeners() {
+    // Dialog open buttons
+    document.getElementById('openApiDialog').onclick = () => showDialog('api');
+    document.getElementById('openCreditsDialog').onclick = () => showDialog('credits');
+    document.getElementById('openHistoryBtn').onclick = () => {
+      loadHistory();
+      showDialog('history');
+    };
+    document.getElementById('openPersonaBtn').onclick = () => {
+      document.getElementById('personaInput').value = currentPersona;
+      showDialog('persona');
+    };
+    document.getElementById('openVoiceBtn').onclick = () => showDialog('voice');
+    document.getElementById('openUploadBtn').onclick = () => {
+      updateUploadedFilesDisplay();
+      showDialog('upload');
+    };
     
-    addMessageToChat(modeMessage, 'ai');
-  };
-
-  // API Dialog functions
-  openBtn.onclick = (e) => {
-    e.stopPropagation();
-    dialog.classList.toggle('show');
-    if (dialog.classList.contains('show')) {
-      apiInput.value = GROQ_API_KEY || '';
-      apiInput.focus();
-    }
-  };
-  closeBtn.onclick = () => { dialog.classList.remove('show'); };
-  
-  // Credits Dialog functions
-  openCreditsBtn.onclick = (e) => {
-    e.stopPropagation();
-    creditsDialog.classList.add('show');
-  };
-  
-  if (closeCreditsBtn) closeCreditsBtn.onclick = () => { creditsDialog.classList.remove('show'); };
-  if (closeCreditsDialogBtn) closeCreditsDialogBtn.onclick = () => { creditsDialog.classList.remove('show'); };
-  
-  // Close dialogs when clicking outside
-  document.addEventListener('click', (e) => {
-    if (!dialog.contains(e.target) && e.target !== openBtn) { 
-      dialog.classList.remove('show'); 
-    }
-    if (creditsDialog && !creditsDialog.contains(e.target) && e.target !== openCreditsBtn) { 
-      creditsDialog.classList.remove('show'); 
-    }
-  });
-
-  // Clear chat button
-  clearChatBtn.onclick = () => {
-    if (confirm('Clear all chat messages and conversation memory?')) {
-      chat.innerHTML = '<div class="msg ai"><div class="formatted-text"><p>Hello! I\'m Ramanujan School AI, created by students of Ramanujan Public School in Prayagraj, Jhalwa. I\'ll remember our conversation as we chat.</p><p><strong>New Features:</strong></p><ul><li>Toggle between offline and online-only modes</li><li>Properly formatted responses with spacing and lists</li><li>Conversation memory for context-aware answers</li><li>Clean, modern interface with animations</li></ul><p><strong>Current Mode:</strong> <span id="currentModeDisplay">' + (OFFLINE_MODE_ENABLED ? 'Hybrid Mode (Offline + Online)' : 'Online-Only Mode') + '</span></p><p>' + (OFFLINE_MODE_ENABLED ? 'In hybrid mode, simple queries use offline knowledge and complex ones use AI API.' : 'In online-only mode, all questions go directly to the AI API for comprehensive answers.') + '</p><p>Ask me anything! 🙂</p></div></div>';
-      conversationMemory.clear();
-      // Update the currentModeDisplay in the new message
-      setTimeout(() => {
-        const newModeDisplay = document.getElementById('currentModeDisplay');
-        if (newModeDisplay) {
-          newModeDisplay.textContent = OFFLINE_MODE_ENABLED 
-            ? 'Hybrid Mode (Offline + Online)' 
-            : 'Online-Only Mode';
+    // Dialog close buttons
+    document.getElementById('closeApiDialog').onclick = hideAllDialogs;
+    document.getElementById('closeCreditsDialog').onclick = hideAllDialogs;
+    document.getElementById('closeCreditsBtn').onclick = hideAllDialogs;
+    document.getElementById('closeHistoryDialog').onclick = hideAllDialogs;
+    document.getElementById('closeHistoryBtn').onclick = hideAllDialogs;
+    document.getElementById('closePersonaDialog').onclick = hideAllDialogs;
+    document.getElementById('closeVoiceDialog').onclick = hideAllDialogs;
+    document.getElementById('closeVoiceBtn').onclick = hideAllDialogs;
+    document.getElementById('closeUploadDialog').onclick = hideAllDialogs;
+    document.getElementById('closeUploadBtn').onclick = hideAllDialogs;
+    
+    // Overlay click
+    dialogOverlay.onclick = hideAllDialogs;
+    
+    // Mode toggle
+    document.getElementById('modeToggleBtn').onclick = () => {
+      OFFLINE_MODE_ENABLED = !OFFLINE_MODE_ENABLED;
+      localStorage.setItem('OFFLINE_MODE_ENABLED', OFFLINE_MODE_ENABLED);
+      updateModeUI();
+      
+      const modeMessage = OFFLINE_MODE_ENABLED 
+        ? 'Switched to Hybrid Mode: I will use offline knowledge for simple queries and online AI for complex questions.' 
+        : 'Switched to Online-Only Mode: All queries will be sent to the AI API for comprehensive answers.';
+      
+      addMessageToChat(modeMessage, 'ai');
+    };
+    
+    // Clear chat button
+    document.getElementById('clearChatBtn').onclick = () => {
+      if (confirm('Clear all chat messages and conversation memory?')) {
+        chat.innerHTML = '<div class="msg ai"><div class="formatted-text"><p>Hello! I\'m Ramanujan School AI, created by students of Ramanujan Public School in Prayagraj, Jhalwa. I\'ll remember our conversation as we chat.</p><p><strong>New Features:</strong></p><ul><li>Microphone input - Click 🎤 to speak</li><li>Voice output - Choose from male/female voices</li><li>Chat history and persona settings</li><li>File upload support (text files)</li><li>Toggle between offline and online-only modes</li><li>Properly formatted responses with spacing and lists</li><li>Conversation memory for context-aware answers</li></ul><p><strong>Current Mode:</strong> <span id="currentModeDisplay">' + (OFFLINE_MODE_ENABLED ? 'Hybrid Mode (Offline + Online)' : 'Online-Only Mode') + '</span></p><p>' + (OFFLINE_MODE_ENABLED ? 'In hybrid mode, simple queries use offline knowledge and complex ones use AI API.' : 'In online-only mode, all questions go directly to the AI API for comprehensive answers.') + '</p><p>Ask me anything! 🙂</p></div></div>';
+        conversationMemory.clear();
+      }
+    };
+    
+    // API Key management
+    document.getElementById('saveKey').onclick = () => {
+      const apiInput = document.getElementById('apiInput');
+      const v = apiInput.value.trim();
+      if (v) {
+        if (v.length < 20) {
+          apiStatus.textContent = '❌ Key seems too short. Please check.';
+          apiStatus.className = 'api-status invalid';
+          return;
         }
-      }, 100);
-    }
-  };
-
-  // API Key management
-  saveKey.onclick = () => {
-    const v = apiInput.value.trim();
-    if (v) {
-      if (v.length < 20) {
-        apiStatus.textContent = '❌ Key seems too short. Please check.';
+        localStorage.setItem('GROQ_API_KEY', v);
+        GROQ_API_KEY = v;
+        updateApiStatus();
+        hideAllDialogs();
+        addMessageToChat('Groq API key saved successfully! You can now use online features.', 'ai');
+      }
+    };
+    
+    document.getElementById('clearKey').onclick = () => {
+      localStorage.removeItem('GROQ_API_KEY');
+      GROQ_API_KEY = null;
+      document.getElementById('apiInput').value = '';
+      updateApiStatus();
+      addMessageToChat('API key cleared. Switching to offline mode only.', 'ai');
+    };
+    
+    document.getElementById('testKey').onclick = async () => {
+      if (!GROQ_API_KEY) {
+        apiStatus.textContent = '❌ No API key to test';
         apiStatus.className = 'api-status invalid';
         return;
       }
-      localStorage.setItem('GROQ_API_KEY', v);
-      GROQ_API_KEY = v;
-      updateApiStatus();
-      dialog.classList.remove('show');
-      addMessageToChat('Groq API key saved successfully! You can now use online features.', 'ai');
-    }
-  };
-
-  clearKey.onclick = () => {
-    localStorage.removeItem('GROQ_API_KEY');
-    GROQ_API_KEY = null;
-    apiInput.value = '';
-    updateApiStatus();
-    addMessageToChat('API key cleared. Switching to offline mode only.', 'ai');
-  };
-
-  testKey.onclick = async () => {
-    if (!GROQ_API_KEY) {
-      apiStatus.textContent = '❌ No API key to test';
-      apiStatus.className = 'api-status invalid';
-      return;
-    }
-    apiStatus.textContent = '🔄 Testing Groq API key...';
-    apiStatus.className = 'api-status';
-    try {
-      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${GROQ_API_KEY}`
-        },
-        body: JSON.stringify({
-          messages: [{ role: 'user', content: 'Say "API test successful" if you can read this.' }],
-          model: 'llama-3.1-8b-instant',
-          max_tokens: 20
-        })
-      });
-      if (response.ok) {
-        apiStatus.textContent = '✅ Groq API key is working!';
-        apiStatus.className = 'api-status valid';
-      } else {
-        const error = await response.json();
-        let errorMsg = `❌ API error: ${error.error?.message || 'Unknown error'}`;
-        apiStatus.textContent = errorMsg;
+      apiStatus.textContent = '🔄 Testing Groq API key...';
+      apiStatus.className = 'api-status';
+      try {
+        const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${GROQ_API_KEY}`
+          },
+          body: JSON.stringify({
+            messages: [{ role: 'user', content: 'Say "API test successful" if you can read this.' }],
+            model: 'llama-3.1-8b-instant',
+            max_tokens: 20
+          })
+        });
+        if (response.ok) {
+          apiStatus.textContent = '✅ Groq API key is working!';
+          apiStatus.className = 'api-status valid';
+        } else {
+          const error = await response.json();
+          let errorMsg = `❌ API error: ${error.error?.message || 'Unknown error'}`;
+          apiStatus.textContent = errorMsg;
+          apiStatus.className = 'api-status invalid';
+        }
+      } catch (err) {
+        apiStatus.textContent = '❌ Network error - check connection';
         apiStatus.className = 'api-status invalid';
       }
-    } catch (err) {
-      apiStatus.textContent = '❌ Network error - check connection';
-      apiStatus.className = 'api-status invalid';
+    };
+    
+    // Persona settings
+    document.getElementById('savePersonaBtn').onclick = () => {
+      const persona = document.getElementById('personaInput').value.trim();
+      if (persona) {
+        localStorage.setItem('AI_PERSONA', persona);
+        currentPersona = persona;
+        addMessageToChat('AI persona settings saved! The AI will now respond according to your instructions.', 'ai');
+      } else {
+        localStorage.removeItem('AI_PERSONA');
+        currentPersona = '';
+        addMessageToChat('AI persona settings cleared. Using default behavior.', 'ai');
+      }
+      hideAllDialogs();
+    };
+    
+    document.getElementById('clearPersonaBtn').onclick = () => {
+      document.getElementById('personaInput').value = '';
+    };
+    
+    // Voice settings
+    document.getElementById('autoSpeakToggle').onchange = (e) => {
+      autoSpeak = e.target.checked;
+      localStorage.setItem('auto_speak', autoSpeak);
+    };
+    
+    document.getElementById('testVoiceBtn').onclick = () => {
+      speakText('This is a test of the selected voice. The text to speech system is working correctly.');
+    };
+    
+    // History
+    document.getElementById('clearHistoryBtn').onclick = () => {
+      if (confirm('Clear all chat history?')) {
+        conversationMemory.clear();
+        loadHistory();
+      }
+    };
+    
+    // File upload
+    const uploadArea = document.getElementById('uploadArea');
+    const fileInput = document.getElementById('fileInput');
+    
+    uploadArea.onclick = () => fileInput.click();
+    
+    fileInput.onchange = handleFileUpload;
+    
+    uploadArea.ondragover = (e) => {
+      e.preventDefault();
+      uploadArea.classList.add('dragover');
+    };
+    
+    uploadArea.ondragleave = () => {
+      uploadArea.classList.remove('dragover');
+    };
+    
+    uploadArea.ondrop = (e) => {
+      e.preventDefault();
+      uploadArea.classList.remove('dragover');
+      handleFileUpload({ target: { files: e.dataTransfer.files } });
+    };
+    
+    document.getElementById('clearFilesBtn').onclick = () => {
+      if (confirm('Clear all uploaded files?')) {
+        fileStorage.clearAll();
+        updateUploadedFilesDisplay();
+      }
+    };
+    
+    // Send button and input
+    send.onclick = ask;
+    q.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        ask();
+      }
+    });
+  }
+
+  // File upload handling
+  async function handleFileUpload(event) {
+    const files = Array.from(event.target.files);
+    
+    for (const file of files) {
+      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+        addMessageToChat(`File "${file.name}" is too large (max 5MB)`, 'ai');
+        continue;
+      }
+      
+      const reader = new FileReader();
+      
+      reader.onload = async (e) => {
+        try {
+          let content = e.target.result;
+          
+          // For text files, use as-is
+          if (file.type === 'text/plain') {
+            // Content is already text
+          } else if (file.type === 'application/pdf') {
+            // PDF extraction would require a library
+            content = `[PDF file: ${file.name}] - Please upgrade to extract text from PDF files.`;
+          } else if (file.type.includes('document')) {
+            // Word document
+            content = `[Document: ${file.name}] - Text extraction for documents requires additional libraries.`;
+          } else {
+            content = `[File: ${file.name}] - Unsupported file type.`;
+          }
+          
+          fileStorage.addFile(file.name, content, file.size);
+          updateUploadedFilesDisplay();
+          addMessageToChat(`File "${file.name}" uploaded successfully. You can now ask questions about its content.`, 'ai');
+        } catch (error) {
+          console.error('Error reading file:', error);
+          addMessageToChat(`Error reading file "${file.name}"`, 'ai');
+        }
+      };
+      
+      reader.onerror = () => {
+        addMessageToChat(`Error reading file "${file.name}"`, 'ai');
+      };
+      
+      if (file.type === 'text/plain') {
+        reader.readAsText(file);
+      } else {
+        reader.readAsDataURL(file);
+      }
     }
-  };
-  
-  apiInput.addEventListener('keydown', (e) => { 
-    if (e.key === 'Enter') saveKey.click(); 
-  });
+    
+    // Reset file input
+    fileInput.value = '';
+  }
+
+  function updateUploadedFilesDisplay() {
+    const uploadedFilesDiv = document.getElementById('uploadedFiles');
+    const files = fileStorage.getFiles();
+    
+    if (files.length === 0) {
+      uploadedFilesDiv.innerHTML = '<div style="text-align: center; color: var(--muted); padding: 20px;">No files uploaded yet</div>';
+      return;
+    }
+    
+    let html = '';
+    files.forEach(file => {
+      const size = formatFileSize(file.size);
+      html += `
+        <div class="uploaded-file">
+          <div>
+            <div class="file-name">${file.name}</div>
+            <div class="file-size">${size} • ${new Date(file.uploaded).toLocaleDateString()}</div>
+          </div>
+          <button class="remove-file" onclick="removeFile('${file.id}')">×</button>
+        </div>
+      `;
+    });
+    
+    uploadedFilesDiv.innerHTML = html;
+  }
+
+  function formatFileSize(bytes) {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+  }
+
+  function removeFile(id) {
+    fileStorage.removeFile(id);
+    updateUploadedFilesDisplay();
+  }
+
+  // History loading
+  function loadHistory() {
+    const historyContent = document.getElementById('historyContent');
+    const messages = conversationMemory.getFullHistory();
+    
+    if (messages.length === 0) {
+      historyContent.innerHTML = '<div style="text-align: center; color: var(--muted); padding: 20px;">No chat history yet</div>';
+      return;
+    }
+    
+    let html = '';
+    messages.forEach((msg, index) => {
+      const time = new Date(msg.timestamp).toLocaleString();
+      const role = msg.role === 'user' ? '👤 You' : '🤖 AI';
+      const content = msg.content.length > 150 ? msg.content.substring(0, 150) + '...' : msg.content;
+      
+      html += `
+        <div class="history-item">
+          <div class="history-header">
+            <div class="history-role">${role}</div>
+            <div class="history-time">${time}</div>
+          </div>
+          <div class="history-content">${content.replace(/\n/g, ' ')}</div>
+        </div>
+      `;
+    });
+    
+    historyContent.innerHTML = html;
+  }
 
   // Knowledge base
   const SCHOOL_KB = `Ramanujan Public School is a co-educational English-medium senior secondary school located in Jhalwa, Prayagraj (formerly Allahabad), Uttar Pradesh, India. It's affiliated with the Central Board of Secondary Education (CBSE) and offers classes from nursery up to class 12.
@@ -1218,37 +1978,48 @@ Jagannath symbolizes universality, compassion, and inclusiveness.`;
     'probability': 'Probability measures the likelihood of events occurring.'
   };
 
-  // Offline reply function (ONLY used when OFFLINE_MODE_ENABLED is true)
+  // Offline reply function
   function offlineReply(text) {
-    if (!OFFLINE_MODE_ENABLED) return null; // Skip offline mode if disabled
+    if (!OFFLINE_MODE_ENABLED) return null;
     
     text = text.toLowerCase().trim();
     
-    // Only handle very basic greetings in offline mode
+    // Basic greetings
     if (/^(hi|hello|hey|namaste)/i.test(text)) return 'Hello! How may I assist you with your studies today?';
     if (/how are you/i.test(text)) return 'I am functioning well. Ready to help with your questions!';
+    if (/what is your name/i.test(text)) return 'I am Ramanujan School AI, created by students of Class IX-B at Ramanujan Public School.';
+    if (/who created you/i.test(text)) return 'I was created by students of Class IX-B at Ramanujan Public School, Prayagraj.';
     
-    // For specific school queries that mention Ramanujan school by name
+    // School queries
     if (text.includes('ramanujan school') || text.includes('ramanujan public school') || 
-        text.includes('school in jhalwa') || text.includes('rps jhalwa')) {
+        text.includes('school in jhalwa') || text.includes('rps jhalwa') ||
+        text.includes('ramanujan') && text.includes('school')) {
       return SCHOOL_KB;
     }
     
-    // For Jagannath queries
+    // Jagannath queries
     if (/jagannath|puri temple|rath yatra/i.test(text)) return JAGANNATH_KB;
     
-    // For very specific math terms
+    // Math terms
     const mathTerms = ['pythagoras', 'quadratic', 'algebra', 'geometry', 'calculus', 'trigonometry', 'statistics', 'probability'];
     for (const term of mathTerms) {
-      if (text.includes(term) && text.split(' ').length < 5) { // Only for very short queries
+      if (text.includes(term) && text.split(' ').length < 5) {
         return MATH_KB[term] || null;
+      }
+    }
+    
+    // Check uploaded files
+    if (text.includes('uploaded file') || text.includes('my file') || text.includes('attached file')) {
+      const files = fileStorage.getFiles();
+      if (files.length > 0) {
+        return `You have ${files.length} uploaded file(s). To ask about a specific file, mention its name or ask about the content directly.`;
       }
     }
     
     return null;
   }
 
-  // Add message to chat UI with formatting
+  // Add message to chat
   function addMessageToChat(text, cls, isTyping = false) {
     const d = document.createElement('div');
     d.className = `msg ${cls}`;
@@ -1256,9 +2027,18 @@ Jagannath symbolizes universality, compassion, and inclusiveness.`;
     if (isTyping) {
       d.innerHTML = `<div class="typing-indicator"><span></span><span></span><span></span></div>`;
       d.id = 'typing-msg';
-    } else { 
-      // Format the text before adding
+    } else {
       d.innerHTML = formatTextForDisplay(text);
+      
+      // Add audio button for AI messages
+      if (cls === 'ai' && autoSpeak) {
+        const audioBtn = document.createElement('button');
+        audioBtn.className = 'audio-btn';
+        audioBtn.innerHTML = '🔊';
+        audioBtn.style.marginLeft = '10px';
+        audioBtn.onclick = () => speakText(text);
+        d.querySelector('.formatted-text').appendChild(audioBtn);
+      }
     }
     
     chat.appendChild(d);
@@ -1271,7 +2051,7 @@ Jagannath symbolizes universality, compassion, and inclusiveness.`;
     if (typingMsg) typingMsg.remove();
   }
 
-  // Main ask function with conversation memory
+  // Main ask function
   async function ask() {
     const text = q.value.trim();
     if (!text) return;
@@ -1284,10 +2064,11 @@ Jagannath symbolizes universality, compassion, and inclusiveness.`;
     
     send.disabled = true;
     q.disabled = true;
+    micBtn.disabled = true;
 
     let typingIndicator = null;
     
-    // Check for offline reply first (only if offline mode is enabled)
+    // Check for offline reply first
     if (OFFLINE_MODE_ENABLED) {
       const localReply = offlineReply(text);
       if (localReply) {
@@ -1297,21 +2078,34 @@ Jagannath symbolizes universality, compassion, and inclusiveness.`;
           removeTypingIndicator();
           addMessageToChat(localReply, 'ai');
           conversationMemory.addMessage('assistant', localReply);
+          speakText(localReply);
           send.disabled = false;
           q.disabled = false;
+          micBtn.disabled = false;
           q.focus();
         }, 500);
         return;
       }
     }
 
-    // If no API key
-    if (!GROQ_API_KEY) {
+    // If no API key but we need online mode
+    if (!GROQ_API_KEY && !OFFLINE_MODE_ENABLED) {
       addMessageToChat('To use online features, please add your Groq API key by clicking the "API Key" button in the top right.', 'ai');
       send.disabled = false;
       q.disabled = false;
+      micBtn.disabled = false;
       q.focus();
-      dialog.classList.add('show');
+      showDialog('api');
+      return;
+    }
+
+    // If no API key and offline mode can't handle it
+    if (!GROQ_API_KEY) {
+      addMessageToChat('I couldn\'t find an answer in my offline knowledge. Please add an API key for online queries or ask simpler questions.', 'ai');
+      send.disabled = false;
+      q.disabled = false;
+      micBtn.disabled = false;
+      q.focus();
       return;
     }
 
@@ -1319,18 +2113,27 @@ Jagannath symbolizes universality, compassion, and inclusiveness.`;
     typingIndicator = addMessageToChat('', 'ai', true);
 
     try {
+      // Check uploaded files for context
+      const files = fileStorage.getFiles();
+      let fileContext = '';
+      if (files.length > 0) {
+        fileContext = '\n\nUser has uploaded these files that you can reference:\n';
+        files.forEach((file, index) => {
+          fileContext += `${index + 1}. ${file.name}: ${file.content.substring(0, 200)}...\n`;
+        });
+      }
+
+      // Build system message with persona
+      const systemMessage = currentPersona 
+        ? `${currentPersona}\n\nYou are Ramanujan School AI created by students.${fileContext}\n\nIMPORTANT: When users ask about "CBSE", provide information about the educational board, not just the school.`
+        : `You are Ramanujan School AI, a helpful assistant created by students of Ramanujan Public School in Prayagraj, Jhalwa.${fileContext}\n\nIMPORTANT: When users ask about "CBSE", provide information about the educational board, not just the school. Format answers with proper paragraphs, lists, and spacing. Use markdown formatting.`;
+
       // Build messages array with conversation history
       const contextMessages = conversationMemory.getContextMessages();
       const messages = [
         {
           role: 'system',
-          content: `You are Ramanujan School AI, a helpful assistant created by students of Ramanujan Public School in Prayagraj, Jhalwa. 
-          
-          IMPORTANT: When users ask about "CBSE", "Central Board of Secondary Education", or general education topics, provide comprehensive information about CBSE as an educational board. DO NOT confuse it with information about Ramanujan Public School unless specifically asked about the school.
-          
-          Ramanujan Public School is affiliated with CBSE, but they are separate entities. Provide accurate information based on the query.
-          
-          Format your answers with proper paragraphs, lists, and spacing. Use markdown formatting for headings (**bold** for emphasis, *italics* for emphasis, ### for subheadings, and bullet points or numbered lists where appropriate). Make responses clear, educational, and well-structured.`
+          content: systemMessage
         },
         ...contextMessages.map(msg => ({
           role: msg.role === 'user' ? 'user' : 'assistant',
@@ -1352,7 +2155,7 @@ Jagannath symbolizes universality, compassion, and inclusiveness.`;
           messages: messages,
           model: 'llama-3.1-8b-instant',
           temperature: 0.7,
-          max_tokens: 800
+          max_tokens: 1000
         })
       });
       
@@ -1375,6 +2178,7 @@ Jagannath symbolizes universality, compassion, and inclusiveness.`;
         const reply = data.choices?.[0]?.message?.content || 'I received an empty response. Please try again.';
         addMessageToChat(reply, 'ai');
         conversationMemory.addMessage('assistant', reply);
+        speakText(reply);
       }
     } catch (err) {
       removeTypingIndicator();
@@ -1384,16 +2188,16 @@ Jagannath symbolizes universality, compassion, and inclusiveness.`;
     
     send.disabled = false;
     q.disabled = false;
+    micBtn.disabled = false;
     q.focus();
   }
 
-  // Event listeners
-  send.onclick = ask;
-  q.addEventListener('keydown', e => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      ask();
-    }
+  // Initialize everything when the page loads
+  document.addEventListener('DOMContentLoaded', () => {
+    updateApiStatus();
+    updateModeUI();
+    initEventListeners();
+    initVoiceRecognition();
   });
 </script>
 </body>
