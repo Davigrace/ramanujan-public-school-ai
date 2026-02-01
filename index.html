@@ -161,6 +161,7 @@
       align-items:center;
       justify-content:center;
       padding:20px;
+      transition: background 0.5s ease;
     }
     .app{
       width:min(980px, 94vw);
@@ -509,7 +510,8 @@
       display: block;
     }
     
-    .api-dialog, .credits-dialog, .history-dialog, .persona-dialog, .voice-dialog, .upload-dialog {
+    .api-dialog, .credits-dialog, .history-dialog, .persona-dialog, .voice-dialog, .upload-dialog,
+    .dev-dialog, .background-dialog {
       position: absolute;
       top: 50%;
       left: 50%;
@@ -532,7 +534,8 @@
       to { opacity: 1; transform: translateY(0) translate(-50%, -50%); }
     }
     .api-dialog.show, .credits-dialog.show, .history-dialog.show, 
-    .persona-dialog.show, .voice-dialog.show, .upload-dialog.show {
+    .persona-dialog.show, .voice-dialog.show, .upload-dialog.show,
+    .dev-dialog.show, .background-dialog.show {
       display: block;
     }
     
@@ -544,7 +547,8 @@
     }
     
     .api-dialog h3, .credits-dialog h3, .history-dialog h3, 
-    .persona-dialog h3, .voice-dialog h3, .upload-dialog h3 {
+    .persona-dialog h3, .voice-dialog h3, .upload-dialog h3,
+    .dev-dialog h3, .background-dialog h3 {
       margin: 0 0 20px 0;
       font-size: 20px;
       display: flex;
@@ -573,6 +577,14 @@
       content: "📁";
       font-size: 18px;
     }
+    .dev-dialog h3:before {
+      content: "💻";
+      font-size: 18px;
+    }
+    .background-dialog h3:before {
+      content: "🎨";
+      font-size: 18px;
+    }
     
     .api-input-container {
       display: flex;
@@ -599,7 +611,103 @@
       border-color: var(--accent);
     }
     
-    /* Voice selection - FIXED */
+    /* Dev mode styles */
+    .dev-editor-container {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .code-tabs {
+      display: flex;
+      gap: 5px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .code-tab {
+      padding: 8px 15px;
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.3s ease;
+    }
+    .code-tab.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+    .code-editor {
+      height: 250px;
+      background: #1a1f3f;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 10px;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      color: var(--text);
+      resize: none;
+      white-space: pre;
+      overflow: auto;
+    }
+    .code-output {
+      height: 200px;
+      background: #0a0e1f;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .output-frame {
+      width: 100%;
+      height: 100%;
+      border: none;
+      background: white;
+    }
+    .dev-controls {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+    
+    /* Background selector styles */
+    .background-options {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    .background-option {
+      cursor: pointer;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 2px solid transparent;
+      transition: all 0.3s ease;
+    }
+    .background-option:hover {
+      transform: translateY(-3px);
+    }
+    .background-option.selected {
+      border-color: var(--accent);
+      box-shadow: 0 0 15px rgba(108, 242, 194, 0.3);
+    }
+    .bg-preview {
+      height: 100px;
+      background-size: cover;
+      background-position: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 600;
+      text-shadow: 0 2px 5px rgba(0,0,0,0.5);
+    }
+    .bg-name {
+      padding: 10px;
+      background: rgba(0, 0, 0, 0.7);
+      text-align: center;
+      font-size: 12px;
+    }
+    
+    /* Voice selection */
     .voice-options {
       display: flex;
       flex-direction: column;
@@ -654,7 +762,7 @@
       background: rgba(108, 242, 194, 0.2);
     }
     
-    /* Upload area - FIXED */
+    /* Upload area */
     .upload-area {
       border: 2px dashed rgba(255, 255, 255, 0.2);
       border-radius: 12px;
@@ -908,6 +1016,60 @@
       background:rgba(255,255,255,0.1);
       color:var(--text);
     }
+    
+    /* ===== AUDIO CONTROL BUTTONS ===== */
+    .audio-controls-container {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    
+    .speak-btn, .stop-btn {
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      border: 1px solid;
+    }
+    
+    .speak-btn {
+      background: rgba(108, 242, 194, 0.1);
+      border-color: rgba(108, 242, 194, 0.3);
+      color: var(--accent);
+    }
+    
+    .speak-btn:hover:not(:disabled) {
+      background: rgba(108, 242, 194, 0.2);
+    }
+    
+    .stop-btn {
+      background: rgba(255, 100, 100, 0.1);
+      border-color: rgba(255, 100, 100, 0.3);
+      color: #ff7a7a;
+    }
+    
+    .stop-btn:hover:not(:disabled) {
+      background: rgba(255, 100, 100, 0.2);
+    }
+    
+    .speak-btn:disabled, .stop-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    .voice-playing-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      margin-left: 10px;
+      color: var(--accent);
+      font-size: 12px;
+      animation: pulse 1.5s infinite;
+    }
   </style>
 </head>
 <body>
@@ -1012,6 +1174,8 @@
         <button class="action-btn" id="openPersonaBtn">🎭 Persona</button>
         <button class="action-btn" id="openVoiceBtn">🔊 Voice</button>
         <button class="action-btn" id="openUploadBtn">📁 Upload</button>
+        <button class="action-btn" id="openDevModeBtn">💻 Dev Mode</button>
+        <button class="action-btn" id="openBackgroundBtn">🎨 Background</button>
         <button class="action-btn" id="openCreditsDialog">⭐ Credits</button>
       </div>
     </header>
@@ -1021,6 +1185,10 @@
       <div class="msg ai">
         <div class="formatted-text">
           <p>Hello! I am Ramanujan Public School AI assistant. How can I help you today?</p>
+          <div class="audio-controls-container">
+            <button class="speak-btn">🔊 Speak</button>
+            <button class="stop-btn" disabled>⏹️ Stop</button>
+          </div>
         </div>
       </div>
     </div>
@@ -1122,7 +1290,7 @@
     </div>
   </div>
 
-  <!-- Voice Settings Dialog - FIXED -->
+  <!-- Voice Settings Dialog -->
   <div id="voiceDialog" class="voice-dialog">
     <button class="close-dialog" id="closeVoiceDialog">×</button>
     <h3>Voice Settings</h3>
@@ -1142,7 +1310,7 @@
     <button class="credits-close" id="closeVoiceBtn">Close</button>
   </div>
 
-  <!-- Upload Dialog - FIXED -->
+  <!-- Upload Dialog -->
   <div id="uploadDialog" class="upload-dialog">
     <button class="close-dialog" id="closeUploadDialog">×</button>
     <h3>File Upload</h3>
@@ -1171,6 +1339,135 @@
     </div>
   </div>
 
+  <!-- Development Mode Dialog -->
+  <div id="devDialog" class="dev-dialog">
+    <button class="close-dialog" id="closeDevDialog">×</button>
+    <h3>App Development Mode</h3>
+    <div class="credits-content">
+      <p>Write HTML, CSS, and JavaScript code to create web apps. Preview them in real-time!</p>
+      
+      <div class="dev-editor-container">
+        <div class="code-tabs">
+          <button class="code-tab active" data-tab="html">HTML</button>
+          <button class="code-tab" data-tab="css">CSS</button>
+          <button class="code-tab" data-tab="js">JavaScript</button>
+        </div>
+        
+        <textarea id="htmlEditor" class="code-editor active">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+  &lt;title&gt;My App&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;h1&gt;Hello, World!&lt;/h1&gt;
+  &lt;p&gt;Edit this code to create your own web app.&lt;/p&gt;
+  &lt;button onclick="showMessage()"&gt;Click Me&lt;/button&gt;
+  &lt;div id="output"&gt;&lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;</textarea>
+        
+        <textarea id="cssEditor" class="code-editor" style="display: none;">body {
+  font-family: Arial, sans-serif;
+  text-align: center;
+  padding: 50px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  min-height: 100vh;
+  margin: 0;
+}
+
+h1 {
+  font-size: 3em;
+  margin-bottom: 20px;
+}
+
+p {
+  font-size: 1.2em;
+  margin-bottom: 30px;
+}
+
+button {
+  padding: 12px 30px;
+  font-size: 1.1em;
+  background: white;
+  color: #667eea;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: transform 0.3s;
+}
+
+button:hover {
+  transform: scale(1.05);
+}
+
+#output {
+  margin-top: 30px;
+  font-size: 1.3em;
+  font-weight: bold;
+}</textarea>
+        
+        <textarea id="jsEditor" class="code-editor" style="display: none;">function showMessage() {
+  const output = document.getElementById('output');
+  const messages = [
+    "Great job! 🎉",
+    "Code executed successfully! ✅",
+    "Welcome to App Development Mode! 💻",
+    "You're creating amazing apps! ✨",
+    "Keep coding! 👨‍💻"
+  ];
+  const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+  output.innerHTML = randomMessage;
+  
+  // Add some animation
+  output.style.opacity = '0';
+  output.style.transform = 'translateY(20px)';
+  
+  setTimeout(() => {
+    output.style.transition = 'all 0.5s ease';
+    output.style.opacity = '1';
+    output.style.transform = 'translateY(0)';
+  }, 10);
+}
+
+// Initialize
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('App loaded successfully!');
+});</textarea>
+      </div>
+      
+      <div class="code-output">
+        <iframe id="codeOutputFrame" class="output-frame"></iframe>
+      </div>
+    </div>
+    <div class="dev-controls">
+      <button id="runCodeBtn" class="secondary">▶ Run Code</button>
+      <button id="resetCodeBtn" class="secondary">🔄 Reset</button>
+      <button id="closeDevBtn" class="credits-close">Close</button>
+    </div>
+  </div>
+
+  <!-- Background Dialog -->
+  <div id="backgroundDialog" class="background-dialog">
+    <button class="close-dialog" id="closeBackgroundDialog">×</button>
+    <h3>Background Settings</h3>
+    <div class="credits-content">
+      <p>Choose a background for the chat interface:</p>
+      
+      <div class="background-options" id="backgroundOptions">
+        <!-- Background options will be added here -->
+      </div>
+      
+      <div style="margin-top: 20px;">
+        <small style="color: var(--muted);">
+          Background changes apply to the main chat window only. 
+          Changes are saved automatically.
+        </small>
+      </div>
+    </div>
+    <button class="credits-close" id="closeBackgroundBtn">Close</button>
+  </div>
+
 <script>
   /* ===== STARTUP SCREEN LOGIC ===== */
   let currentSlide = 0;
@@ -1196,8 +1493,12 @@
       startupScreen.style.display = 'none';
       document.getElementById('mainApp').style.display = 'grid';
       document.getElementById('q').focus();
-      initVoiceSettings(); // Initialize voice settings
-      updateModeIndicators(); // Update mode indicators
+      initVoiceSettings();
+      updateModeIndicators();
+      initBackgroundSettings();
+      
+      // Initialize audio buttons for initial message
+      initAudioButtons();
     }, 600);
   }
 
@@ -1252,7 +1553,7 @@
     formattedText = paragraphs.filter(p => p).join('');
     formattedText = formattedText.replace(/\n/g, '<br>');
     
-    return '<div class="formatted-text">' + formattedText + '</div>';
+    return formattedText;
   }
 
   /* ===== MAIN APPLICATION ===== */
@@ -1380,11 +1681,43 @@
   let selectedVoice = localStorage.getItem('selected_voice') || 'female';
   let autoSpeak = localStorage.getItem('auto_speak') === 'true';
   let currentPersona = localStorage.getItem('AI_PERSONA') || '';
+  let currentBackground = localStorage.getItem('background_mode') || 'default';
   
   // Speech synthesis
   let speechSynthesis = window.speechSynthesis;
   let voices = [];
   let currentUtterance = null;
+  let isSpeaking = false;
+  let currentSpeakingMessage = null;
+  
+  // Background presets
+  const BACKGROUND_PRESETS = [
+    {
+      id: 'default',
+      name: 'Default Space',
+      preview: 'linear-gradient(145deg, #0a0e1f 0%, #13172b 50%, #0f1220 100%)'
+    },
+    {
+      id: 'nature',
+      name: 'Nature Green',
+      preview: 'linear-gradient(135deg, #1a2f3b 0%, #2d5a3d 50%, #1a2f3b 100%)'
+    },
+    {
+      id: 'sunset',
+      name: 'Sunset Orange',
+      preview: 'linear-gradient(135deg, #2c3e50 0%, #e74c3c 50%, #f39c12 100%)'
+    },
+    {
+      id: 'ocean',
+      name: 'Ocean Blue',
+      preview: 'linear-gradient(135deg, #0c2461 0%, #1e3799 50%, #4a69bd 100%)'
+    },
+    {
+      id: 'none',
+      name: 'No Background',
+      preview: '#0f1220'
+    }
+  ];
 
   // DOM Elements
   const dialogOverlay = document.getElementById('dialogOverlay');
@@ -1402,7 +1735,9 @@
     history: document.getElementById('historyDialog'),
     persona: document.getElementById('personaDialog'),
     voice: document.getElementById('voiceDialog'),
-    upload: document.getElementById('uploadDialog')
+    upload: document.getElementById('uploadDialog'),
+    dev: document.getElementById('devDialog'),
+    background: document.getElementById('backgroundDialog')
   };
   
   // Mode indicators
@@ -1434,6 +1769,208 @@
     
     // Load uploaded files display
     updateUploadedFilesDisplay();
+  }
+
+  function initBackgroundSettings() {
+    // Apply saved background
+    applyBackground(currentBackground);
+    
+    // Populate background options
+    const backgroundOptions = document.getElementById('backgroundOptions');
+    backgroundOptions.innerHTML = '';
+    
+    BACKGROUND_PRESETS.forEach(bg => {
+      const option = document.createElement('div');
+      option.className = `background-option ${currentBackground === bg.id ? 'selected' : ''}`;
+      option.innerHTML = `
+        <div class="bg-preview" style="background: ${bg.preview};">
+          ${bg.name}
+        </div>
+        <div class="bg-name">${bg.name}</div>
+      `;
+      
+      option.onclick = () => {
+        currentBackground = bg.id;
+        localStorage.setItem('background_mode', bg.id);
+        applyBackground(bg.id);
+        
+        // Update selected state
+        document.querySelectorAll('.background-option').forEach(opt => {
+          opt.classList.remove('selected');
+        });
+        option.classList.add('selected');
+      };
+      
+      backgroundOptions.appendChild(option);
+    });
+  }
+
+  function applyBackground(bgId) {
+    const body = document.body;
+    const bg = BACKGROUND_PRESETS.find(b => b.id === bgId);
+    
+    if (!bg) return;
+    
+    if (bgId === 'default') {
+      body.style.background = `
+        linear-gradient(rgba(15,18,32,.75), rgba(15,18,32,.75)),
+        url('assets/images/bg.png') center/cover no-repeat
+      `;
+    } else if (bgId === 'none') {
+      body.style.background = bg.preview;
+    } else {
+      body.style.background = bg.preview;
+    }
+  }
+
+  function initDevMode() {
+    // Set up code tabs
+    const tabs = document.querySelectorAll('.code-tab');
+    const editors = document.querySelectorAll('.code-editor');
+    
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        const tabName = tab.getAttribute('data-tab');
+        
+        // Update active tab
+        tabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        
+        // Show corresponding editor
+        editors.forEach(editor => {
+          if (editor.id === `${tabName}Editor`) {
+            editor.style.display = 'block';
+          } else {
+            editor.style.display = 'none';
+          }
+        });
+      });
+    });
+    
+    // Run code button
+    document.getElementById('runCodeBtn').onclick = runCode;
+    
+    // Reset code button
+    document.getElementById('resetCodeBtn').onclick = resetCode;
+    
+    // Run initial code
+    setTimeout(runCode, 100);
+  }
+
+  function runCode() {
+    const htmlCode = document.getElementById('htmlEditor').value;
+    const cssCode = document.getElementById('cssEditor').value;
+    const jsCode = document.getElementById('jsEditor').value;
+    
+    const fullCode = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>${cssCode}</style>
+      </head>
+      <body>
+        ${htmlCode}
+        <script>${jsCode}<\/script>
+      </body>
+      </html>
+    `;
+    
+    const frame = document.getElementById('codeOutputFrame');
+    const frameDoc = frame.contentDocument || frame.contentWindow.document;
+    
+    frameDoc.open();
+    frameDoc.write(fullCode);
+    frameDoc.close();
+  }
+
+  function resetCode() {
+    if (confirm('Reset all code to default?')) {
+      document.getElementById('htmlEditor').value = `<!DOCTYPE html>
+<html>
+<head>
+  <title>My App</title>
+</head>
+<body>
+  <h1>Hello, World!</h1>
+  <p>Edit this code to create your own web app.</p>
+  <button onclick="showMessage()">Click Me</button>
+  <div id="output"></div>
+</body>
+</html>`;
+      
+      document.getElementById('cssEditor').value = `body {
+  font-family: Arial, sans-serif;
+  text-align: center;
+  padding: 50px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  min-height: 100vh;
+  margin: 0;
+}
+
+h1 {
+  font-size: 3em;
+  margin-bottom: 20px;
+}
+
+p {
+  font-size: 1.2em;
+  margin-bottom: 30px;
+}
+
+button {
+  padding: 12px 30px;
+  font-size: 1.1em;
+  background: white;
+  color: #667eea;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: transform 0.3s;
+}
+
+button:hover {
+  transform: scale(1.05);
+}
+
+#output {
+  margin-top: 30px;
+  font-size: 1.3em;
+  font-weight: bold;
+}`;
+      
+      document.getElementById('jsEditor').value = `function showMessage() {
+  const output = document.getElementById('output');
+  const messages = [
+    "Great job! 🎉",
+    "Code executed successfully! ✅",
+    "Welcome to App Development Mode! 💻",
+    "You're creating amazing apps! ✨",
+    "Keep coding! 👨‍💻"
+  ];
+  const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+  output.innerHTML = randomMessage;
+  
+  // Add some animation
+  output.style.opacity = '0';
+  output.style.transform = 'translateY(20px)';
+  
+  setTimeout(() => {
+    output.style.transition = 'all 0.5s ease';
+    output.style.opacity = '1';
+    output.style.transform = 'translateY(0)';
+  }, 10);
+}
+
+// Initialize
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('App loaded successfully!');
+});`;
+      
+      runCode();
+    }
   }
 
   function populateVoiceOptions() {
@@ -1485,10 +2022,11 @@
           <div class="voice-name">${voice.name}</div>
           <div class="voice-type">${voice.type}</div>
         </div>
-        <button class="voice-preview" onclick="previewVoice('${voice.id}')">▶️</button>
+        <button class="voice-preview">▶️</button>
       `;
       
-      option.querySelector('input').addEventListener('change', (e) => {
+      const radioBtn = option.querySelector('input');
+      radioBtn.addEventListener('change', (e) => {
         selectedVoice = e.target.value;
         localStorage.setItem('selected_voice', selectedVoice);
         
@@ -1499,34 +2037,84 @@
         option.classList.add('selected');
       });
       
+      const previewBtn = option.querySelector('.voice-preview');
+      previewBtn.onclick = () => {
+        const tempVoice = selectedVoice;
+        selectedVoice = voice.id;
+        speakText("This is a preview of the selected voice. The text to speech system is working correctly.");
+        selectedVoice = tempVoice;
+      };
+      
       voiceOptions.appendChild(option);
     });
   }
 
-  // Voice preview function
-  window.previewVoice = function(voiceId) {
-    speakText("This is a preview of the selected voice. The text to speech system is working correctly.");
-  };
+  // Initialize audio buttons for all AI messages
+  function initAudioButtons() {
+    const aiMessages = document.querySelectorAll('.msg.ai');
+    aiMessages.forEach(message => {
+      const audioControls = message.querySelector('.audio-controls-container');
+      if (audioControls) {
+        const speakBtn = audioControls.querySelector('.speak-btn');
+        const stopBtn = audioControls.querySelector('.stop-btn');
+        
+        if (speakBtn) {
+          speakBtn.onclick = () => {
+            // Get the text content from the message
+            const messageText = message.querySelector('.formatted-text')?.innerText || 
+                               message.innerText.replace('🔊 Speak⏹️ Stop', '').trim();
+            speakText(messageText);
+          };
+        }
+        
+        if (stopBtn) {
+          stopBtn.onclick = stopSpeaking;
+        }
+      }
+    });
+  }
 
   // Speech functions
   function speakText(text) {
-    if (!speechSynthesis || !autoSpeak) return;
+    if (!speechSynthesis) {
+      console.warn('Speech synthesis not available');
+      return;
+    }
     
     // Stop any current speech
-    if (currentUtterance) {
-      speechSynthesis.cancel();
+    if (isSpeaking) {
+      stopSpeaking();
     }
     
     // Clean text for speech (remove markdown, etc.)
     const cleanText = text
-      .replace(/[#*`\[\]]/g, '')
+      .replace(/[#*`\[\]<>]/g, '')
       .replace(/\n/g, ' ')
       .replace(/\s+/g, ' ')
       .trim();
     
-    if (!cleanText) return;
+    if (!cleanText) {
+      console.warn('No text to speak');
+      return;
+    }
     
     currentUtterance = new SpeechSynthesisUtterance(cleanText);
+    isSpeaking = true;
+    
+    // Update UI to show speaking state
+    updateSpeakingUI(true);
+    
+    currentUtterance.onend = function() {
+      isSpeaking = false;
+      currentSpeakingMessage = null;
+      updateSpeakingUI(false);
+    };
+    
+    currentUtterance.onerror = function() {
+      isSpeaking = false;
+      currentSpeakingMessage = null;
+      updateSpeakingUI(false);
+    };
     
     // Set voice based on selection
     const availableVoices = speechSynthesis.getVoices();
@@ -1570,8 +2158,51 @@
   }
 
   function stopSpeaking() {
-    if (speechSynthesis && speechSynthesis.speaking) {
+    if (speechSynthesis && isSpeaking) {
       speechSynthesis.cancel();
+      isSpeaking = false;
+      currentSpeakingMessage = null;
+      updateSpeakingUI(false);
+    }
+  }
+
+  function updateSpeakingUI(speaking) {
+    // Update all speak/stop buttons in the chat
+    const aiMessages = document.querySelectorAll('.msg.ai');
+    
+    aiMessages.forEach(message => {
+      const audioControls = message.querySelector('.audio-controls-container');
+      if (audioControls) {
+        const speakBtn = audioControls.querySelector('.speak-btn');
+        const stopBtn = audioControls.querySelector('.stop-btn');
+        
+        if (speakBtn) {
+          speakBtn.disabled = speaking;
+          speakBtn.style.opacity = speaking ? '0.5' : '1';
+        }
+        
+        if (stopBtn) {
+          stopBtn.disabled = !speaking;
+          stopBtn.style.opacity = !speaking ? '0.5' : '1';
+        }
+      }
+    });
+    
+    // Update voice playing indicator
+    const voicePlayingIndicator = document.getElementById('voicePlayingIndicator');
+    if (speaking) {
+      if (!voicePlayingIndicator) {
+        const hint = document.querySelector('.hint');
+        const indicator = document.createElement('span');
+        indicator.id = 'voicePlayingIndicator';
+        indicator.className = 'voice-playing-indicator';
+        indicator.innerHTML = '🔊 Speaking...';
+        hint.appendChild(indicator);
+      }
+    } else {
+      if (voicePlayingIndicator) {
+        voicePlayingIndicator.remove();
+      }
     }
   }
 
@@ -1694,6 +2325,11 @@
     // Show overlay and selected dialog
     dialogOverlay.classList.add('show');
     dialogs[dialogName].classList.add('show');
+    
+    // Initialize specific dialogs
+    if (dialogName === 'dev') {
+      initDevMode();
+    }
   }
 
   function hideAllDialogs() {
@@ -1721,6 +2357,8 @@
       updateUploadedFilesDisplay();
       showDialog('upload');
     };
+    document.getElementById('openDevModeBtn').onclick = () => showDialog('dev');
+    document.getElementById('openBackgroundBtn').onclick = () => showDialog('background');
     
     // Dialog close buttons
     document.getElementById('closeApiDialog').onclick = hideAllDialogs;
@@ -1733,6 +2371,10 @@
     document.getElementById('closeVoiceBtn').onclick = hideAllDialogs;
     document.getElementById('closeUploadDialog').onclick = hideAllDialogs;
     document.getElementById('closeUploadBtn').onclick = hideAllDialogs;
+    document.getElementById('closeDevDialog').onclick = hideAllDialogs;
+    document.getElementById('closeDevBtn').onclick = hideAllDialogs;
+    document.getElementById('closeBackgroundDialog').onclick = hideAllDialogs;
+    document.getElementById('closeBackgroundBtn').onclick = hideAllDialogs;
     
     // Overlay click
     dialogOverlay.onclick = hideAllDialogs;
@@ -1740,8 +2382,9 @@
     // Clear chat button
     document.getElementById('clearChatBtn').onclick = () => {
       if (confirm('Clear all chat messages?')) {
-        chat.innerHTML = '<div class="msg ai"><div class="formatted-text"><p>Hello! I am Ramanujan Public School AI assistant. How can I help you today?</p></div></div>';
+        chat.innerHTML = '<div class="msg ai"><div class="formatted-text"><p>Hello! I am Ramanujan Public School AI assistant. How can I help you today?</p><div class="audio-controls-container"><button class="speak-btn">🔊 Speak</button><button class="stop-btn" disabled>⏹️ Stop</button></div></div></div>';
         conversationMemory.clear();
+        initAudioButtons();
       }
     };
     
@@ -1842,7 +2485,7 @@
       }
     };
     
-    // File upload - FIXED
+    // File upload
     const uploadArea = document.getElementById('uploadArea');
     const fileInput = document.getElementById('fileInput');
     
@@ -1921,7 +2564,7 @@
     }
   }
 
-  // File upload handling - FIXED
+  // File upload handling
   async function handleFileUpload(event) {
     const files = Array.from(event.target.files);
     
@@ -1988,12 +2631,22 @@
             <div class="file-name">${file.name}</div>
             <div class="file-size">${size} • ${date}</div>
           </div>
-          <button class="remove-file" onclick="removeUploadedFile('${file.id}')">×</button>
+          <button class="remove-file">×</button>
         </div>
       `;
     });
     
     uploadedFilesDiv.innerHTML = html;
+    
+    // Add event listeners to remove buttons
+    uploadedFilesDiv.querySelectorAll('.remove-file').forEach((btn, index) => {
+      btn.onclick = () => {
+        const fileId = files[index].id;
+        fileStorage.removeFile(fileId);
+        updateUploadedFilesDisplay();
+        addMessageToChat('File removed from storage.', 'ai');
+      };
+    });
   }
 
   function formatFileSize(bytes) {
@@ -2001,12 +2654,6 @@
     if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
     return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
   }
-
-  window.removeUploadedFile = function(id) {
-    fileStorage.removeFile(id);
-    updateUploadedFilesDisplay();
-    addMessageToChat('File removed from storage.', 'ai');
-  };
 
   // History loading
   function loadHistory() {
@@ -2038,7 +2685,7 @@
     historyContent.innerHTML = html;
   }
 
-  // Enhanced Knowledge Base - FIXED with comprehensive Jagannath info
+  // Enhanced Knowledge Base
   const SCHOOL_KB = `Ramanujan Public School is a co-educational English-medium senior secondary school located in Jhalwa, Prayagraj (formerly Allahabad), Uttar Pradesh, India. It's affiliated with the Central Board of Secondary Education (CBSE) and offers classes from nursery up to class 12.
 
 🏫 About the School
@@ -2120,16 +2767,18 @@ Lord Jagannath represents the essence of Sanatana Dharma - universal, inclusive,
     'probability': 'Probability measures the likelihood of events occurring.'
   };
 
-  // Features description (when asked about new features)
+  // Features description
   const FEATURES_KB = `I have several new features that make me more useful:
 
 **🎤 Voice Input:** Click the microphone button to speak your questions instead of typing
-**🔊 Voice Output:** I can read responses aloud with selectable male/female voices
+**🔊 Voice Output:** I can read responses aloud with selectable male/female voices. Use the stop button to stop playback.
 **📁 File Upload:** Upload text files and ask questions about their content
 **📜 Chat History:** View and manage your conversation history
 **🎭 AI Persona:** Customize how I respond by setting personality instructions
 **🔑 API Integration:** Connect to Groq AI for more comprehensive answers
 **⚡ Mode Selection:** Choose between Online, Offline, or Hybrid modes
+**💻 App Development Mode:** Write HTML/CSS/JavaScript code and run it in real-time
+**🎨 Background Customization:** Choose from 3 preset backgrounds or no background
 **📱 Modern UI:** Clean, responsive interface with animations
 
 **Mode Details:**
@@ -2156,6 +2805,16 @@ To access these features, click the ⚙️ Features button in the top right.`;
       return FEATURES_KB;
     }
     
+    // Check for dev mode
+    if (/dev(elopment)? mode|code editor|html editor|write code/i.test(text)) {
+      return 'You can access the App Development Mode by clicking the ⚙️ Features button and selecting "💻 Dev Mode". There you can write HTML, CSS, and JavaScript code and run it in real-time!';
+    }
+    
+    // Check for background mode
+    if (/background|theme|color scheme|change look/i.test(text)) {
+      return 'You can change the background by clicking the ⚙️ Features button and selecting "🎨 Background". There are 3 preset backgrounds and an option for no background.';
+    }
+    
     // School queries
     if (text.includes('ramanujan school') || text.includes('ramanujan public school') || 
         text.includes('school in jhalwa') || text.includes('rps jhalwa') ||
@@ -2163,7 +2822,7 @@ To access these features, click the ⚙️ Features button in the top right.`;
       return SCHOOL_KB;
     }
     
-    // Jagannath queries - comprehensive matching
+    // Jagannath queries
     if (/jagannath|puri temple|rath yatra|jaganath|jagganath/i.test(text)) {
       return JAGANNATH_KB;
     }
@@ -2201,17 +2860,29 @@ To access these features, click the ⚙️ Features button in the top right.`;
       d.innerHTML = `<div class="typing-indicator"><span></span><span></span><span></span></div>`;
       d.id = 'typing-msg';
     } else {
-      d.innerHTML = formatTextForDisplay(text);
+      const formattedText = formatTextForDisplay(text);
+      d.innerHTML = `<div class="formatted-text">${formattedText}</div>`;
       
-      // Add audio button for AI messages
-      if (cls === 'ai' && autoSpeak) {
-        const audioBtn = document.createElement('button');
-        audioBtn.className = 'audio-btn';
-        audioBtn.innerHTML = '🔊';
-        audioBtn.style.marginLeft = '10px';
-        audioBtn.style.marginTop = '10px';
-        audioBtn.onclick = () => speakText(text);
-        d.querySelector('.formatted-text').appendChild(audioBtn);
+      // Add audio controls for AI messages
+      if (cls === 'ai') {
+        const audioControls = document.createElement('div');
+        audioControls.className = 'audio-controls-container';
+        audioControls.innerHTML = `
+          <button class="speak-btn">🔊 Speak</button>
+          <button class="stop-btn" disabled>⏹️ Stop</button>
+        `;
+        
+        // Add event listeners
+        const speakBtn = audioControls.querySelector('.speak-btn');
+        const stopBtn = audioControls.querySelector('.stop-btn');
+        
+        speakBtn.onclick = () => {
+          speakText(text);
+        };
+        
+        stopBtn.onclick = stopSpeaking;
+        
+        d.querySelector('.formatted-text').appendChild(audioControls);
       }
     }
     
@@ -2252,7 +2923,12 @@ To access these features, click the ⚙️ Features button in the top right.`;
           removeTypingIndicator();
           addMessageToChat(localReply, 'ai');
           conversationMemory.addMessage('assistant', localReply);
-          speakText(localReply);
+          
+          // Auto-speak if enabled
+          if (autoSpeak) {
+            speakText(localReply);
+          }
+          
           send.disabled = false;
           q.disabled = false;
           micBtn.disabled = false;
@@ -2352,7 +3028,11 @@ To access these features, click the ⚙️ Features button in the top right.`;
         const reply = data.choices?.[0]?.message?.content || 'I received an empty response. Please try again.';
         addMessageToChat(reply, 'ai');
         conversationMemory.addMessage('assistant', reply);
-        speakText(reply);
+        
+        // Auto-speak if enabled
+        if (autoSpeak) {
+          speakText(reply);
+        }
       }
     } catch (err) {
       removeTypingIndicator();
@@ -2372,6 +3052,7 @@ To access these features, click the ⚙️ Features button in the top right.`;
     updateModeIndicators();
     initEventListeners();
     initVoiceRecognition();
+    initAudioButtons();
   });
 </script>
 </body>
