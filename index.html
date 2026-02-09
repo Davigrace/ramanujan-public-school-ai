@@ -297,7 +297,7 @@
     
     .code-runner-content {
       flex: 1;
-      background: white;
+      background: transparent;
       margin: 10px;
       border-radius: 12px;
       overflow: auto;
@@ -307,6 +307,7 @@
       width: 100%;
       height: 100%;
       border: none;
+      background: transparent;
     }
     
     /* Header */
@@ -1546,21 +1547,6 @@
             <div style="font-size: 12px; color: var(--muted); margin-top: 4px;">High quality • Better reasoning • Complex tasks</div>
           </button>
         </div>
-        
-        <!-- Other Models -->
-        <div class="model-category" style="margin-top: 10px;">
-          <h4 style="color: var(--accent); font-size: 14px; margin-bottom: 10px;">🌟 Other Models</h4>
-          
-          <button class="model-option" data-model="mixtral-8x7b-32768" style="width: 100%; text-align: left; background: rgba(255, 182, 193, 0.1); border: 1px solid rgba(255, 182, 193, 0.3); color: var(--text); padding: 12px; border-radius: 8px; cursor: pointer; margin-bottom: 8px; transition: all 0.3s ease;">
-            <div style="font-weight: 600; font-size: 14px;">Mixtral 8x7B</div>
-            <div style="font-size: 12px; color: var(--muted); margin-top: 4px;">Large context • 32K tokens • Multilingual</div>
-          </button>
-          
-          <button class="model-option" data-model="gemma2-9b-it" style="width: 100%; text-align: left; background: rgba(255, 182, 193, 0.1); border: 1px solid rgba(255, 182, 193, 0.3); color: var(--text); padding: 12px; border-radius: 8px; cursor: pointer; margin-bottom: 8px; transition: all 0.3s ease;">
-            <div style="font-weight: 600; font-size: 14px;">Gemma 2 9B</div>
-            <div style="font-size: 12px; color: var(--muted); margin-top: 4px;">Google • Improved performance • Versatile</div>
-          </button>
-        </div>
       </div>
 
 
@@ -1805,7 +1791,7 @@ document.addEventListener('DOMContentLoaded', function() {
       <button class="close-runner-btn" onclick="closeCodeRunner()">✕ Close</button>
     </div>
     <div class="code-runner-content" id="codeRunnerContent">
-      <iframe id="codeRunnerFrame"></iframe>
+      <iframe id="codeRunnerFrame" sandbox="allow-scripts allow-same-origin allow-forms allow-modals allow-popups"></iframe>
     </div>
   </div>
 
@@ -2704,9 +2690,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const validModels = [
     'llama-3.3-70b-versatile',
     'llama-3.1-8b-instant',
-    'llama-3.1-70b-versatile',
-    'mixtral-8x7b-32768',
-    'gemma2-9b-it'
+    'llama-3.1-70b-versatile'
   ];
   
   let currentModel = localStorage.getItem('selected_model') || 'llama-3.1-8b-instant';
@@ -2751,9 +2735,7 @@ document.addEventListener('DOMContentLoaded', function() {
       const modelNames = {
         'llama-3.3-70b-versatile': 'Llama 3.3 70B Versatile',
         'llama-3.1-8b-instant': 'Llama 3.1 8B Instant',
-        'llama-3.1-70b-versatile': 'Llama 3.1 70B Versatile',
-        'mixtral-8x7b-32768': 'Mixtral 8x7B',
-        'gemma2-9b-it': 'Gemma 2 9B'
+        'llama-3.1-70b-versatile': 'Llama 3.1 70B Versatile'
       };
       
       const displayElement = document.getElementById('currentModelDisplay');
@@ -3418,8 +3400,23 @@ To access these features, click the ⚙️ Features button in the top right.`;
 
       // Build system message with persona
       const systemMessage = currentPersona 
-        ? `${currentPersona}\n\nYou are Ramanujan School AI created by students.${fileContext}\n\nIMPORTANT: When users ask about "CBSE", provide information about the educational board, not just the school.`
-        : `You are Ramanujan School AI, a helpful assistant created by students of Ramanujan Public School in Prayagraj, Jhalwa.${fileContext}\n\nIMPORTANT: When users ask about "CBSE", provide information about the educational board, not just the school. Format answers with proper paragraphs, lists, and spacing. Use markdown formatting.`;
+        ? `${currentPersona}\n\nYou are Ramanujan School AI created by students.${fileContext}\n\nIMPORTANT: 
+1. When users ask about "CBSE", provide information about the educational board, not just the school.
+2. When writing HTML code, ALWAYS include complete HTML structure:
+   - Start with <!DOCTYPE html>
+   - Include <html>, <head>, and <body> tags
+   - Put ALL styles in <head> using <style> tags
+   - Make sure background colors and styles are in the <body> or appropriate elements
+   - Wrap code in \`\`\`html code blocks`
+        : `You are Ramanujan School AI, a helpful assistant created by students of Ramanujan Public School in Prayagraj, Jhalwa.${fileContext}\n\nIMPORTANT: 
+1. When users ask about "CBSE", provide information about the educational board, not just the school.
+2. When writing HTML code, ALWAYS include complete HTML structure:
+   - Start with <!DOCTYPE html>
+   - Include <html>, <head>, and <body> tags
+   - Put ALL styles in <head> using <style> tags or inline styles
+   - Make sure background colors are applied to <body> tag (e.g., <body style="background: red;">)
+   - Wrap code in \`\`\`html code blocks
+3. Format answers with proper paragraphs, lists, and spacing. Use markdown formatting.`;
 
       // Build messages array with conversation history
       const contextMessages = conversationMemory.getContextMessages();
@@ -3500,14 +3497,27 @@ To access these features, click the ⚙️ Features button in the top right.`;
   function showCodeRunner(code) {
     document.body.classList.add('split-mode');
     const frame = document.getElementById('codeRunnerFrame');
-    const blob = new Blob([code], { type: 'text/html' });
-    const url = URL.createObjectURL(blob);
-    frame.src = url;
+    
+    // Use srcdoc for better compatibility and immediate rendering
+    frame.srcdoc = code;
+    
+    // Fallback to blob URL method if srcdoc fails
+    setTimeout(() => {
+      if (!frame.contentDocument || frame.contentDocument.body.children.length === 0) {
+        const blob = new Blob([code], { type: 'text/html; charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        frame.src = url;
+        
+        // Clean up blob URL after loading
+        frame.onload = () => URL.revokeObjectURL(url);
+      }
+    }, 100);
   }
   
   function closeCodeRunner() {
     document.body.classList.remove('split-mode');
     const frame = document.getElementById('codeRunnerFrame');
+    frame.srcdoc = '';
     frame.src = '';
   }
   
